@@ -15,13 +15,20 @@
     .muted{ color:var(--muted) } .row{ display:grid; grid-template-columns:1fr; gap:16px } @media(min-width:700px){ .row-2{ grid-template-columns:repeat(2,1fr) } .row-3{ grid-template-columns:repeat(3,1fr) } }
     header{ position:sticky; top:0; background:rgba(255,255,255,.8); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); z-index:50 } nav a{ margin-right:16px; font-size:14px; color:#111827 }
     .hero{ position:relative; overflow:hidden } .pill{ display:inline-flex; padding:6px 12px; border-radius:999px; border:1px solid rgba(17,24,39,.15); background:rgba(17,24,39,.03); font-size:12px; font-weight:700 }
-    .hero-visual{ height:320px; border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; position:relative } .slide{ position:absolute; inset:0; display:flex; justify-content:space-between; align-items:flex-end; padding:24px; color:#fff; transition:opacity .6s }
+    .hero-visual{ height:320px; border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; position:relative }
+    .slide{ position:absolute; inset:0; display:flex; justify-content:space-between; align-items:flex-end; padding:24px; color:#fff; transition:opacity .6s }
     .badge{ display:inline-flex; transform:rotate(-6deg); border:2px solid rgba(255,255,255,.7); background:rgba(255,255,255,.15); padding:6px 10px; border-radius:12px; font-weight:900; letter-spacing:.18em; font-size:11px }
     .shadow{ box-shadow:var(--shadow) } .progress{ height:8px; width:180px; background:#f1f5f9; border-radius:999px; overflow:hidden } .progress>div{ height:100%; background:#111827 }
     .input,.textarea{ width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px } .grid-2{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-2{ grid-template-columns:repeat(2,1fr) } }
-    .grid-3{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-3{ grid-template-columns:repeat(3,1fr) } } .list{ list-style:disc; padding-left:18px } .small{ font-size:12px } .xsmall{ font-size:11px; color:#64748b }
-    .pillbar{ display:flex; gap:8px; flex-wrap:wrap } .hidden{ display:none } .modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100 }
-    .tabular{ font-variant-numeric:tabular-nums } .footer{ border-top:1px solid var(--border); background:#fff } #chat-fab{ position:fixed; right:18px; bottom:18px; z-index:60 }
+    .grid-3{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-3{ grid-template-columns:repeat(3,1fr) } }
+    .list{ list-style:disc; padding-left:18px } .small{ font-size:12px } .xsmall{ font-size:11px; color:#64748b }
+    .pillbar{ display:flex; gap:8px; flex-wrap:wrap }
+    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100 }
+    .footer{ border-top:1px solid var(--border); background:#fff }
+    #chat-fab{ position:fixed; right:18px; bottom:18px; z-index:60 }
+
+    /* Critical: ensure modal can be hidden (wins over .modal display:flex) */
+    .modal.hidden, .hidden, #chat-modal[aria-hidden="true"] { display: none !important; }
   </style>
 </head>
 <body>
@@ -39,6 +46,7 @@
   </header>
 
   <main>
+    <!-- HERO -->
     <section class="section hero">
       <div class="container row row-2">
         <div>
@@ -90,6 +98,7 @@
       </div>
     </section>
 
+    <!-- HOW IT WORKS -->
     <section id="how" class="section">
       <div class="container">
         <h2 class="h2">How it works</h2>
@@ -103,6 +112,7 @@
       </div>
     </section>
 
+    <!-- QUESTIONNAIRE -->
     <section id="questionnaire" class="section">
       <div class="container">
         <h2 class="h2">Get matched in under 2 minutes</h2>
@@ -152,6 +162,7 @@
       </div>
     </section>
 
+    <!-- RESULTS -->
     <section id="results" class="section hidden">
       <div class="container">
         <h2 class="h2">Your best-fit matches</h2>
@@ -170,6 +181,7 @@
       </div>
     </section>
 
+    <!-- MORTGAGE STRIP -->
     <section id="mortgage" class="section">
       <div class="container">
         <h2 class="h2">Mortgage & Insurance referrals</h2>
@@ -182,6 +194,7 @@
       </div>
     </section>
 
+    <!-- DATA PILOT -->
     <section id="admin" class="section">
       <div class="container">
         <h2 class="h2">Pilot data (CSV import) — Chicagoland</h2>
@@ -193,34 +206,6 @@ X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,
 X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
 X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0"></textarea>
           <div style="display:flex; gap:10px; align-items:center; margin-top:10px;"><button id="load-sample" class="btn btn-outline">Load sample</button><button id="import" class="btn">Import CSV</button><span id="status" class="xsmall"></span></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="faq" class="section">
-      <div class="container">
-        <h2 class="h2">FAQ</h2>
-        <div class="card" style="margin-top:12px;">
-          <details open style="padding:12px 16px; border-bottom:1px solid var(--border);"><summary class="h3">Are you affiliated with any brokerage or agent?</summary><div class="small muted" style="margin-top:6px;">No. We are independent and unbiased. Agents only see high-level needs until both sides opt-in.</div></details>
-          <details style="padding:12px 16px; border-bottom:1px solid var(--border);"><summary class="h3">Do you charge clients?</summary><div class="small muted" style="margin-top:6px;">No. We are paid by the agent only after a successful connection via a standard 25% referral fee.</div></details>
-          <details style="padding:12px 16px;"><summary class="h3">What data powers the match?</summary><div class="small muted" style="margin-top:6px;">We use 50+ signals including neighborhood focus, property type, price band, buyer/seller orientation, track record, marketing resources, and more.</div></details>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="section">
-      <div class="container row row-2">
-        <div class="card" style="padding:16px;">
-          <div class="h3">Send a message</div>
-          <form onsubmit="return false" style="margin-top:10px;">
-            <input class="input" placeholder="Email (optional)">
-            <textarea class="textarea" rows="4" placeholder="Your note" style="margin-top:10px;"></textarea>
-            <button class="btn" style="margin-top:10px;">Send</button>
-          </form>
-        </div>
-        <div class="card" style="padding:16px;">
-          <div class="h3">Privacy first</div>
-          <div class="small muted" style="margin-top:6px;">We keep your details confidential. We will never sell your data. Anonymous by default; you choose when to reveal your identity.</div>
         </div>
       </div>
     </section>
@@ -258,7 +243,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
     let slideIdx=0; setInterval(()=>{ const ids=['slide0','slide1','slide2']; slideIdx=(slideIdx+1)%ids.length; ids.forEach((id,i)=>{ const el=document.getElementById(id); el.style.opacity=(i===slideIdx?1:0); }); },3500);
 
     /* Mock data */
-    let AGENTS=[
+    let AGENTS=[ /* ... same as before ... */ 
       {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1},
       {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0},
       {id:'A3',alias:'First-Time Buyer Guide',neighborhoods:['Lincoln Square','Ravenswood','Avondale','Logan Square'],propertyTypes:['Condo','Townhome'],priceMin:300000,priceMax:800000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:38,resources:['Lender Intros','Buyer Workshops','Offer Playbooks'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.0},
@@ -271,7 +256,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
       {id:'A10',alias:'Edgewater/Rogers Park Condos',neighborhoods:['Edgewater','Rogers Park'],propertyTypes:['Condo'],priceMin:200000,priceMax:500000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:28,resources:['Assessment Intel','Transit Access','HOA Docs'],brokerageMarketing:3,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:0.9}
     ];
 
-    /* Scoring */
+    /* Scoring helpers */
     const METRICS={neighborhood:{label:'Neighborhood specialization',weight:{Buyer:.22,Seller:.18}},productType:{label:'Product type fit',weight:{Buyer:.12,Seller:.12}},priceBand:{label:'Price band fit',weight:{Buyer:.12,Seller:.12}},roleFocus:{label:'Buyer/Seller focus',weight:{Buyer:.10,Seller:.10}},resources:{label:'Resources to achieve goals',weight:{Buyer:.18,Seller:.22}},brokerage:{label:'Brokerage marketing power',weight:{Buyer:.08,Seller:.12}},trackRecord:{label:'Success & track record',weight:{Buyer:.18,Seller:.14}}};
     const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
     function overlapRatio(range,aMin,aMax){ const [pMin,pMax]=range||[0,0]; const inter=Math.max(0,Math.min(pMax,aMax)-Math.max(pMin,aMin)); const uni=Math.max(pMax,aMax)-Math.min(pMin,aMin); return uni>0?inter/uni:0 }
@@ -311,7 +296,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
       return bullets
     }
 
-    /* Questionnaire state */
+    /* Questionnaire */
     const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
     const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
     const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
@@ -351,7 +336,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
     finishBtn.onclick=()=>{ document.getElementById('results').classList.remove('hidden'); window.location.hash='#results'; renderResults() };
     renderPropertyTypeButtons(); renderPriorityCheckboxes(); goStep(0);
 
-    /* Results */
+    /* Results rendering */
     function renderResults(){
       const sc=AGENTS.map(a=>({agent:a,score:scoreAgent(a,state),bullets:narrative(a,state)})).sort((x,y)=>y.score.total-x.score.total);
       const top3=sc.slice(0,3), rest=sc.slice(3,10);
