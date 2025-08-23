@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agent Ranks — Confidential Agent Matching (Standalone Demo v2)</title>
+  <title>Agent Ranks — Confidential Agent Matching (with Dynamic Rank Badge)</title>
   <style>
     :root { --bg:#fff; --fg:#0f172a; --muted:#475569; --border:#e2e8f0; --accent:#111827; --soft:#f8fafc; --shadow:0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.06); --radius:14px; }
     *{ box-sizing:border-box } html,body{ height:100%; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji" }
@@ -15,18 +15,13 @@
     .muted{ color:var(--muted) } .row{ display:grid; grid-template-columns:1fr; gap:16px } @media(min-width:700px){ .row-2{ grid-template-columns:repeat(2,1fr) } .row-3{ grid-template-columns:repeat(3,1fr) } }
     header{ position:sticky; top:0; background:rgba(255,255,255,.8); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); z-index:50 } nav a{ margin-right:16px; font-size:14px; color:#111827 }
     .hero{ position:relative; overflow:hidden } .pill{ display:inline-flex; padding:6px 12px; border-radius:999px; border:1px solid rgba(17,24,39,.15); background:rgba(17,24,39,.03); font-size:12px; font-weight:700 }
-    .hero-visual{ height:320px; border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; position:relative }
-    .slide{ position:absolute; inset:0; display:flex; justify-content:space-between; align-items:flex-end; padding:24px; color:#fff; transition:opacity .6s }
+    .hero-visual{ height:320px; border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; position:relative } .slide{ position:absolute; inset:0; display:flex; justify-content:space-between; align-items:flex-end; padding:24px; color:#fff; transition:opacity .6s }
     .badge{ display:inline-flex; transform:rotate(-6deg); border:2px solid rgba(255,255,255,.7); background:rgba(255,255,255,.15); padding:6px 10px; border-radius:12px; font-weight:900; letter-spacing:.18em; font-size:11px }
     .shadow{ box-shadow:var(--shadow) } .progress{ height:8px; width:180px; background:#f1f5f9; border-radius:999px; overflow:hidden } .progress>div{ height:100%; background:#111827 }
     .input,.textarea{ width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px } .grid-2{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-2{ grid-template-columns:repeat(2,1fr) } }
-    .grid-3{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-3{ grid-template-columns:repeat(3,1fr) } }
-    .list{ list-style:disc; padding-left:18px } .small{ font-size:12px } .xsmall{ font-size:11px; color:#64748b }
-    .pillbar{ display:flex; gap:8px; flex-wrap:wrap }
-    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100 }
-    .footer{ border-top:1px solid var(--border); background:#fff }
-    #chat-fab{ position:fixed; right:18px; bottom:18px; z-index:60 }
-
+    .grid-3{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-3{ grid-template-columns:repeat(3,1fr) } } .list{ list-style:disc; padding-left:18px } .small{ font-size:12px } .xsmall{ font-size:11px; color:#64748b }
+    .pillbar{ display:flex; gap:8px; flex-wrap:wrap } .hidden{ display:none } .modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100 }
+    .tabular{ font-variant-numeric:tabular-nums } .footer{ border-top:1px solid var(--border); background:#fff } #chat-fab{ position:fixed; right:18px; bottom:18px; z-index:60 }
     /* Critical: ensure modal can be hidden (wins over .modal display:flex) */
     .modal.hidden, .hidden, #chat-modal[aria-hidden="true"] { display: none !important; }
   </style>
@@ -35,7 +30,8 @@
   <header>
     <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px;">
       <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:32px; height:32px; border-radius:12px; background:linear-gradient(135deg,#6366f1,#a855f7,#f43f5e);"></div>
+        <!-- Small static badge as logo (no spin) -->
+        <span id="brand-badge" aria-hidden="true"></span>
         <strong>Agent Ranks</strong>
       </div>
       <nav class="hide-mobile">
@@ -46,19 +42,14 @@
   </header>
 
   <main>
-    <!-- HERO -->
     <section class="section hero">
       <div class="container row row-2">
         <div>
           <span class="pill">Agent Ranks • Confidential • Unbiased</span>
           <h1 class="h1" style="margin-top:12px;">Find your best-fit real estate agent — privately</h1>
-          <p class="muted" style="margin-top:8px; max-width: 600px;">
-            50+ matching signals (neighborhood, product type, price band, buyer/seller focus, marketing power, track record).
-            We present your best 3 matches — with no names or contact shared until <em>both</em> sides opt-in.
-          </p>
+          <p class="muted" style="margin-top:8px; max-width: 600px;">50+ matching signals (neighborhood, product type, price band, buyer/seller focus, marketing power, track record). We present your best 3 matches — with no names or contact shared until <em>both</em> sides opt-in.</p>
           <div style="display:flex; gap:10px; margin-top:16px;">
-            <a class="btn" href="#questionnaire">Start 2-minute match</a>
-            <a class="btn btn-outline" href="#how">How it works</a>
+            <a class="btn" href="#questionnaire">Start 2-minute match</a><a class="btn btn-outline" href="#how">How it works</a>
           </div>
           <div class="card" style="margin-top:16px; padding:12px 14px; background:#111827; color:#fff;">
             <div id="testi-quote" style="font-size:14px;">“We met three great options anonymously and chose the one who sold our place in 11 days.”</div>
@@ -68,11 +59,7 @@
         <div>
           <div class="hero-visual shadow">
             <div class="slide" id="slide0" style="opacity:1; background: radial-gradient(800px 600px at 20% 20%, rgba(255,255,255,.25), transparent), linear-gradient(135deg, #1e3a8a, #7c3aed, #be185d);">
-              <div>
-                <div class="badge">SOLD</div>
-                <div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Accepted over ask</div>
-                <div class="small" style="opacity:.9;">Bucktown • SFH • 11 days</div>
-              </div>
+              <div><div class="badge">SOLD</div><div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Accepted over ask</div><div class="small" style="opacity:.9;">Bucktown • SFH • 11 days</div></div>
               <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; font-size:11px;">
                 <div class="chip" style="background: rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.35);">Anonymous chat ready</div>
                 <div class="chip" style="background: rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.35);">No contact shared</div>
@@ -80,25 +67,16 @@
               </div>
             </div>
             <div class="slide" id="slide1" style="opacity:0; background: radial-gradient(800px 600px at 80% 0%, rgba(255,255,255,.2), transparent), linear-gradient(135deg, #0ea5e9, #6366f1, #db2777);">
-              <div>
-                <div class="badge">UNDER CONTRACT</div>
-                <div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Won first offer</div>
-                <div class="small" style="opacity:.9;">Lincoln Park • Condo • $800k</div>
-              </div>
+              <div><div class="badge">UNDER CONTRACT</div><div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Won first offer</div><div class="small" style="opacity:.9;">Lincoln Park • Condo • $800k</div></div>
             </div>
             <div class="slide" id="slide2" style="opacity:0; background: radial-gradient(800px 600px at 0% 100%, rgba(255,255,255,.2), transparent), linear-gradient(135deg, #2563eb, #9333ea, #e11d48);">
-              <div>
-                <div class="badge">PRIVATE</div>
-                <div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Off-market preview</div>
-                <div class="small" style="opacity:.9;">North Shore • Private showing</div>
-              </div>
+              <div><div class="badge">PRIVATE</div><div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Off-market preview</div><div class="small" style="opacity:.9;">North Shore • Private showing</div></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- HOW IT WORKS -->
     <section id="how" class="section">
       <div class="container">
         <h2 class="h2">How it works</h2>
@@ -112,7 +90,6 @@
       </div>
     </section>
 
-    <!-- QUESTIONNAIRE -->
     <section id="questionnaire" class="section">
       <div class="container">
         <h2 class="h2">Get matched in under 2 minutes</h2>
@@ -130,25 +107,19 @@
           </div>
           <div id="step-1" class="hidden" style="margin-top:12px;">
             <div class="h3">What neighborhood or area?</div>
-            <input id="input-location" class="input" placeholder="e.g., West Loop, Lincoln Park, Hinsdale">
-            <div class="xsmall" style="margin-top:6px;">Tip: You can be specific (e.g., “Bucktown”) or broader (e.g., “North Shore”).</div>
+            <input id="input-location" class="input" placeholder="e.g., West Loop, Lincoln Park, Hinsdale"><div class="xsmall" style="margin-top:6px;">Tip: You can be specific (e.g., “Bucktown”) or broader (e.g., “North Shore”).</div>
           </div>
           <div id="step-2" class="hidden" style="margin-top:12px;">
-            <div class="h3">Property type</div>
-            <div class="grid-3" style="margin-top:10px;"><div id="property-types"></div></div>
+            <div class="h3">Property type</div><div class="grid-3" style="margin-top:10px;"><div id="property-types"></div></div>
           </div>
           <div id="step-3" class="hidden" style="margin-top:12px;">
             <div class="h3">Price range</div>
-            <div class="grid-2" style="margin-top:10px;">
-              <div><div class="xsmall">Min</div><input id="price-min" type="number" class="input" value="400000"></div>
-              <div><div class="xsmall">Max</div><input id="price-max" type="number" class="input" value="1000000"></div>
-            </div>
+            <div class="grid-2" style="margin-top:10px;"><div><div class="xsmall">Min</div><input id="price-min" type="number" class="input" value="400000"></div><div><div class="xsmall">Max</div><input id="price-max" type="number" class="input" value="1000000"></div></div>
             <div class="xsmall" style="margin-top:6px;">Change later if you’re uncertain.</div>
           </div>
           <div id="step-4" class="hidden" style="margin-top:12px;"><div class="h3">What matters most?</div><div id="priorities" class="grid-2" style="margin-top:10px;"></div></div>
           <div id="step-5" class="hidden" style="margin-top:12px;">
-            <div class="h3">Timing</div>
-            <div class="grid-3" style="margin-top:10px;">
+            <div class="h3">Timing</div><div class="grid-3" style="margin-top:10px;">
               <button class="card timing" data-val="0-3 months" style="padding:12px; text-align:left;">0-3 months</button>
               <button class="card timing" data-val="3-6 months" style="padding:12px; text-align:left;">3-6 months</button>
               <button class="card timing" data-val="6-12 months" style="padding:12px; text-align:left;">6-12 months</button>
@@ -162,7 +133,6 @@
       </div>
     </section>
 
-    <!-- RESULTS -->
     <section id="results" class="section hidden">
       <div class="container">
         <h2 class="h2">Your best-fit matches</h2>
@@ -181,7 +151,6 @@
       </div>
     </section>
 
-    <!-- MORTGAGE STRIP -->
     <section id="mortgage" class="section">
       <div class="container">
         <h2 class="h2">Mortgage & Insurance referrals</h2>
@@ -194,7 +163,6 @@
       </div>
     </section>
 
-    <!-- DATA PILOT -->
     <section id="admin" class="section">
       <div class="container">
         <h2 class="h2">Pilot data (CSV import) — Chicagoland</h2>
@@ -218,10 +186,8 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
     </div>
   </footer>
 
-  <!-- Floating chat toggle -->
   <button id="chat-fab" class="btn" title="Open chat">Chat</button>
 
-  <!-- Chat Modal -->
   <div id="chat-modal" class="modal hidden" aria-hidden="true">
     <div class="card" role="dialog" aria-modal="true" style="width: min(720px, 100%); max-height: 80vh; display:flex; flex-direction:column;">
       <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border);">
@@ -242,8 +208,52 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
     let testiIdx=0; setInterval(()=>{ testiIdx=(testiIdx+1)%TESTIMONIALS.length; document.getElementById('testi-quote').textContent='“'+TESTIMONIALS[testiIdx].quote+'”'; document.getElementById('testi-who').textContent='— '+TESTIMONIALS[testiIdx].who; },4000);
     let slideIdx=0; setInterval(()=>{ const ids=['slide0','slide1','slide2']; slideIdx=(slideIdx+1)%ids.length; ids.forEach((id,i)=>{ const el=document.getElementById(id); el.style.opacity=(i===slideIdx?1:0); }); },3500);
 
-    /* Mock data */
-    let AGENTS=[ /* ... same as before ... */ 
+    /* -------- Dynamic Rank Badge (circle, number inside) -------- */
+    function createRankBadge(value, { size = 56, shape = 'circle', mode = 'number', spin = true } = {}) {
+      const v = Math.max(0, Math.min(100, Math.round(value)));
+      const label = (mode === 'grade') ? scoreToGrade(v) : String(v);
+      const gid = 'grad' + Math.random().toString(36).slice(2, 8);
+      const navy = '#0B1F3B', gold = '#C49A6C', track = '#E2E8F0', text = '#0F172A';
+      const c = size / 2, stroke = Math.max(4, Math.round(size * 0.12));
+      const spinClass = spin ? 'spin' : '';
+      const fontSize = Math.round(size*0.36);
+      const r = (size / 2) - (stroke / 2) - 2;
+      const circumference = 2 * Math.PI * r;
+      const target = circumference * (1 - v / 100);
+      return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Rank ${v}">
+  <defs>
+    <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="${navy}"/><stop offset="100%" stop-color="${gold}"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .spin { animation: spin 14s linear infinite }
+    .pulse { animation: pulse 2800ms ease-in-out infinite }
+    @keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+    @keyframes pulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.03) } }
+  </style>
+  <circle cx="${c}" cy="${c}" r="${r}" fill="#fff" stroke="${track}" stroke-width="${stroke}" />
+  <g class="${spinClass}" style="transform-origin:${c}px ${c}px">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="url(#${gid})" stroke-width="${stroke}"
+            stroke-linecap="round" stroke-dasharray="${circumference.toFixed(2)}"
+            stroke-dashoffset="${circumference.toFixed(2)}">
+      <animate attributeName="stroke-dashoffset" from="${circumference.toFixed(2)}" to="${target.toFixed(2)}"
+               dur="0.9s" fill="freeze" begin="0.05s"/>
+    </circle>
+  </g>
+  <text x="${c}" y="${c + Math.round(size*0.06)}" text-anchor="middle"
+        font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial"
+        font-weight="800" font-size="${fontSize}" fill="${text}" class="pulse">${label}</text>
+</svg>`;
+    }
+    function scoreToGrade(v){ if(v>=97)return'A+'; if(v>=93)return'A'; if(v>=90)return'A-'; if(v>=87)return'B+'; if(v>=83)return'B'; if(v>=80)return'B-'; if(v>=77)return'C+'; if(v>=73)return'C'; if(v>=70)return'C-'; return'—' }
+
+    // Small static brand badge in header (no spin)
+    document.getElementById('brand-badge').innerHTML = createRankBadge(98, { size: 24, shape: 'circle', mode: 'number', spin: false });
+
+    /* ------- Matching data & scoring (unchanged) ------- */
+    let AGENTS=[
       {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1},
       {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0},
       {id:'A3',alias:'First-Time Buyer Guide',neighborhoods:['Lincoln Square','Ravenswood','Avondale','Logan Square'],propertyTypes:['Condo','Townhome'],priceMin:300000,priceMax:800000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:38,resources:['Lender Intros','Buyer Workshops','Offer Playbooks'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.0},
@@ -256,7 +266,6 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
       {id:'A10',alias:'Edgewater/Rogers Park Condos',neighborhoods:['Edgewater','Rogers Park'],propertyTypes:['Condo'],priceMin:200000,priceMax:500000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:28,resources:['Assessment Intel','Transit Access','HOA Docs'],brokerageMarketing:3,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:0.9}
     ];
 
-    /* Scoring helpers */
     const METRICS={neighborhood:{label:'Neighborhood specialization',weight:{Buyer:.22,Seller:.18}},productType:{label:'Product type fit',weight:{Buyer:.12,Seller:.12}},priceBand:{label:'Price band fit',weight:{Buyer:.12,Seller:.12}},roleFocus:{label:'Buyer/Seller focus',weight:{Buyer:.10,Seller:.10}},resources:{label:'Resources to achieve goals',weight:{Buyer:.18,Seller:.22}},brokerage:{label:'Brokerage marketing power',weight:{Buyer:.08,Seller:.12}},trackRecord:{label:'Success & track record',weight:{Buyer:.18,Seller:.14}}};
     const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
     function overlapRatio(range,aMin,aMax){ const [pMin,pMax]=range||[0,0]; const inter=Math.max(0,Math.min(pMax,aMax)-Math.max(pMin,aMin)); const uni=Math.max(pMax,aMax)-Math.min(pMin,aMin); return uni>0?inter/uni:0 }
@@ -283,10 +292,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
     }
     function narrative(agent,answers){
       const bullets=[];
-      if(answers.location){
-        const locs=agent.neighborhoods.filter(n=>n.toLowerCase().includes(answers.location.toLowerCase())).slice(0,2).join(', ');
-        if(locs) bullets.push('Specializes near '+locs+'.');
-      }
+      if(answers.location){ const locs=agent.neighborhoods.filter(n=>n.toLowerCase().includes(answers.location.toLowerCase())).slice(0,2).join(', '); if(locs) bullets.push('Specializes near '+locs+'.'); }
       if(answers.propertyType) bullets.push('Primary focus: '+answers.propertyType+'.');
       if(answers.priceRange) bullets.push('Comfortable in your price window ($'+Number(answers.priceRange[0]).toLocaleString()+'–$'+Number(answers.priceRange[1]).toLocaleString()+').');
       if(answers.role) bullets.push(agent.focus+'-oriented strategies.');
@@ -296,7 +302,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
       return bullets
     }
 
-    /* Questionnaire */
+    /* Questionnaire state */
     const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
     const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
     const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
@@ -336,40 +342,38 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
     finishBtn.onclick=()=>{ document.getElementById('results').classList.remove('hidden'); window.location.hash='#results'; renderResults() };
     renderPropertyTypeButtons(); renderPriorityCheckboxes(); goStep(0);
 
-    /* Results rendering */
+    /* Results */
     function renderResults(){
       const sc=AGENTS.map(a=>({agent:a,score:scoreAgent(a,state),bullets:narrative(a,state)})).sort((x,y)=>y.score.total-x.score.total);
       const top3=sc.slice(0,3), rest=sc.slice(3,10);
       const topEl=document.getElementById('top3'); topEl.innerHTML='';
       const restEl=document.getElementById('rest'); restEl.innerHTML='';
-      top3.forEach(r=>topEl.appendChild(renderAgentCard(r)));
-      rest.forEach(r=>restEl.appendChild(renderAgentSmall(r)));
+
+      top3.forEach(r=> topEl.appendChild(renderAgentCard(r)));
+      rest.forEach(r=> restEl.appendChild(renderAgentSmall(r)));
     }
+
     function renderAgentCard(r){
       const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='14px';
+
       const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
-      head.innerHTML='<div><div class="xsmall">Top Match</div><div class="h3">'+r.agent.alias+'</div></div><div style="text-align:right;"><div style="font-size:24px; font-weight:800;">'+r.score.total+'</div><div class="xsmall">Fit score</div></div>';
+      head.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${createRankBadge(r.score.total, { size: 44, shape: 'circle', mode: 'number' })}
+          <div>
+            <div class="xsmall">Top Match</div>
+            <div class="h3">${r.agent.alias}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:24px; font-weight:800;">${r.score.total}</div>
+          <div class="xsmall">Fit score</div>
+        </div>`;
       wrap.appendChild(head);
+
       const ul=document.createElement('ul'); ul.className='list small'; ul.style.marginTop='8px';
-      r.bullets.forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) }); wrap.appendChild(ul);
-
-      const ctrl=document.createElement('div'); ctrl.style.display='flex'; ctrl.style.gap='14px'; ctrl.style.marginTop='8px';
-      const why=document.createElement('button'); why.className='small'; why.style.textDecoration='underline'; why.style.border=0; why.style.background='transparent'; why.textContent='Why this match?';
-      const met=document.createElement('button'); met.className='small'; met.style.textDecoration='underline'; met.style.border=0; met.style.background='transparent'; met.textContent='View metrics';
-      ctrl.appendChild(why); ctrl.appendChild(met); wrap.appendChild(ctrl);
-
-      const whyBox=document.createElement('div'); whyBox.className='card'; whyBox.style.padding='10px'; whyBox.style.background='#f8fafc'; whyBox.style.marginTop='6px'; whyBox.style.display='none';
-      const whyList=document.createElement('div'); whyList.className='xsmall';
-      r.score.parts.forEach(p=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.margin='4px 0';
-        row.innerHTML='<span>'+p.label+'</span><span class="tabular">'+Math.round(p.score*100)+'% × '+Math.round(p.weight*100)+'% = <strong>'+p.points+'</strong></span>'; whyList.appendChild(row); });
-      whyBox.appendChild(whyList); wrap.appendChild(whyBox);
-
-      const metBox=document.createElement('div'); metBox.className='card'; metBox.style.padding='10px'; metBox.style.background='#f8fafc'; metBox.style.marginTop='6px'; metBox.style.display='none';
-      metBox.innerHTML='<div class="grid-3 small"><div><div class="xsmall">Transactions (12m)</div><div class="h3">'+r.agent.transactions12m+'</div></div><div><div class="xsmall">DOM vs Area (seller)</div><div class="h3">'+r.agent.domVsArea+' days</div></div><div><div class="xsmall">SP/LP Δ vs Area (seller)</div><div class="h3">'+r.agent.spLpVsArea+'%</div></div><div><div class="xsmall">Buyer Price Δ vs Area</div><div class="h3">'+r.agent.buyDiscountVsArea+'%</div></div><div><div class="xsmall">Marketing</div><div class="h3">'+r.agent.marketing+'/5</div></div><div><div class="xsmall">Negotiation</div><div class="h3">'+r.agent.negotiation+'/5</div></div><div><div class="xsmall">Brokerage Marketing</div><div class="h3">'+r.agent.brokerageMarketing+'/5</div></div><div style="grid-column:1 / -1;"><div class="xsmall">Neighborhoods</div><div class="small"><strong>'+r.agent.neighborhoods.join(', ')+'</strong></div></div></div>';
-      wrap.appendChild(metBox);
-
-      why.onclick=()=>{ whyBox.style.display=(whyBox.style.display==='none'?'block':'none') };
-      met.onclick=()=>{ metBox.style.display=(metBox.style.display==='none'?'block':'none') };
+      r.bullets.forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
+      wrap.appendChild(ul);
 
       const pillbar=document.createElement('div'); pillbar.className='pillbar'; pillbar.style.marginTop='8px';
       r.agent.propertyTypes.forEach(t=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=t; pillbar.appendChild(s) });
@@ -380,25 +384,37 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
       const btnChat=document.createElement('button'); btnChat.className='btn'; btnChat.textContent='Open anonymous chat';
       const btnSave=document.createElement('button'); btnSave.className='btn btn-outline'; btnSave.textContent='Save for later';
       actions.appendChild(btnChat); actions.appendChild(btnSave); wrap.appendChild(actions);
-      btnChat.onclick=()=>openChat(r.agent);
 
       const note=document.createElement('div'); note.className='xsmall'; note.style.marginTop='6px'; note.textContent='No names or contact details shown. If both sides opt-in, we’ll connect you directly.';
       wrap.appendChild(note);
-      return wrap
+
+      btnChat.onclick = ()=> openChat(r.agent);
+      return wrap;
     }
+
     function renderAgentSmall(r){
       const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='12px';
       const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between';
-      head.innerHTML='<div class="small" style="font-weight:700;">'+r.agent.alias+'</div><div class="small" style="font-weight:700;">'+r.score.total+'</div>'; wrap.appendChild(head);
+      head.innerHTML=`
+        <div class="small" style="font-weight:700; display:flex; align-items:center; gap:8px;">
+          ${createRankBadge(r.score.total, { size: 32, shape: 'circle', mode: 'number' })}
+          ${r.agent.alias}
+        </div>
+        <div class="small" style="font-weight:700;">${r.score.total}</div>`;
+      wrap.appendChild(head);
+
       const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style.marginTop='6px';
-      r.bullets.slice(0,3).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) }); wrap.appendChild(ul);
+      r.bullets.slice(0,3).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
+      wrap.appendChild(ul);
+
       const btn=document.createElement('button'); btn.className='btn'; btn.style.width='100%'; btn.style.marginTop='8px'; btn.textContent='Chat anonymously';
-      btn.onclick=()=>openChat(r.agent); wrap.appendChild(btn);
-      return wrap
+      btn.onclick=()=> openChat(r.agent);
+      wrap.appendChild(btn);
+      return wrap;
     }
 
     /* Chat controls */
-    const modal=document.getElementById('chat-modal'), chatClose=document.getElementById('chat-close'), chatMin=document.getElementById('chat-min'), chatFab=document.getElementById('chat-fab');
+    const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatMin=document.getElementById('chat-min'); const chatFab=document.getElementById('chat-fab');
     function openChat(agent){
       document.getElementById('chat-title').textContent=agent.alias;
       const msgs=document.getElementById('chat-messages'); msgs.innerHTML='';
@@ -416,9 +432,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
       const msgs=document.getElementById('chat-messages'); msgs.appendChild(box); msgs.scrollTop=msgs.scrollHeight;
     }
     document.getElementById('chat-send').onclick=()=>{ const inp=document.getElementById('chat-input'); const t=(inp.value||'').trim(); if(!t) return; appendMsg('You',t); inp.value='' };
-    chatClose.onclick=hideModal; chatMin.onclick=hideModal;
-    modal.addEventListener('click',e=>{ if(e.target===modal) hideModal() });
-    document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideModal() });
+    chatClose.onclick=hideModal; chatMin.onclick=hideModal; modal.addEventListener('click',e=>{ if(e.target===modal) hideModal() }); document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideModal() });
     chatFab.onclick=()=>{ if(modal.classList.contains('hidden')){ document.getElementById('chat-title').textContent='Agent'; const msgs=document.getElementById('chat-messages'); msgs.innerHTML=''; appendMsg('system',"Anonymous chat created. Share only what you're comfortable with."); showModal() } else { hideModal() } };
 
     /* CSV pilot */
