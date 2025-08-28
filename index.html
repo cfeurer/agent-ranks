@@ -1,6 +1,629 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Ranks — Confidential Agent Matching</title>
+<style>
+  :root{
+    --navy:#0B1F3B; --gold:#C49A6C; --ink:#0F172A; --muted:#475569; --border:#E2E8F0; --soft:#F8FAFC; --bg:#FFFFFF;
+    --shadow:0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.06);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:var(--ink); background:var(--bg)}
+  a{color:var(--ink); text-decoration:none}
+  .container{max-width:1100px; margin:0 auto; padding:0 16px}
+  .btn{background:var(--ink); color:#fff; border:0; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer}
+  .btn-outline{background:#fff; color:var(--ink); border:1px solid var(--border); border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer}
+  .card{background:#fff; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow)}
+  .section{padding:48px 0} /* tightened from 64px to move content up */
+  .h1{font-size:40px; line-height:1.1; font-weight:800; letter-spacing:-.02em}
+  .h2{font-size:28px; font-weight:800; letter-spacing:-.02em}
+  .h3{font-size:16px; font-weight:800}
+  .muted{color:var(--muted)}
+  .row{display:grid; grid-template-columns:1fr; gap:16px}
+  @media(min-width:720px){ .row-2{grid-template-columns:1.2fr .8fr} .row-3{grid-template-columns:repeat(3,1fr)} }
+  header{position:sticky; top:0; background:rgba(255,255,255,.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); z-index:50}
+  nav a{margin-right:16px; font-size:14px}
+  .pill{display:inline-flex; padding:6px 12px; border-radius:999px; border:1px solid rgba(17,24,39,.15); background:rgba(17,24,39,.03); font-size:12px; font-weight:700}
+  .hero-visual{height:320px; border-radius:16px; border:1px solid var(--border); overflow:hidden; position:relative}
+  .hero-img{position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity .6s}
+  .hero-img.active{opacity:1}
+  .hero-overlay{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,.0) 35%, rgba(0,0,0,.55) 100%);
+  }
+  .hero-caption{
+    position:absolute; left:16px; right:16px; bottom:16px; color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
+  .hero-cap-title{font-weight:800; font-size:16px; letter-spacing:.01em}
+  .hero-cap-sub{font-size:12px; opacity:.9}
+  .progress{height:8px; width:180px; background:#f1f5f9; border-radius:999px; overflow:hidden}
+  .progress>div{height:100%; background:var(--ink)}
+  .grid-2{display:grid; grid-template-columns:1fr; gap:12px}
+  @media(min-width:700px){ .grid-2{grid-template-columns:repeat(2,1fr)} }
+  .grid-3{display:grid; grid-template-columns:1fr; gap:12px}
+  @media(min-width:700px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
+  .list{list-style:disc; padding-left:18px}
+  .small{font-size:12px} .xsmall{font-size:11px; color:#64748b}
+  .pillbar{display:flex; gap:8px; flex-wrap:wrap}
+  .choice{padding:12px; border:1px solid var(--border); border-radius:12px; background:#fff; text-align:left; cursor:pointer}
+  .choice.selected{border-color:var(--ink); background:#111827; color:#fff}
+  .choice.selected .muted{color:#e5e7eb}
+  .hidden{display:none}
+  .footer{border-top:1px solid var(--border); background:#fff}
+  #chat-fab{position:fixed; right:18px; bottom:18px; z-index:60}
+  /* Critical: ensure modal can be hidden over .modal display:flex */
+  .modal.hidden, .hidden, #chat-modal[aria-hidden="true"]{display:none !important}
+  .modal{position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100}
+  /* Mobile tweaks */
+  @media(max-width:480px){
+    .h1{font-size:32px}
+    .h2{font-size:24px}
+    .brand-name{font-size:1.3em} /* 30% larger name still scales down */
+    .hero-visual{height:260px}
+  }
+</style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <!-- Brand badge +30% (32px) -->
+        <span id="brand-badge" aria-hidden="true"></span>
+        <strong class="brand-name" style="font-size:1.3em">Agent Ranks</strong>
+      </div>
+      <nav class="hide-mobile">
+        <a href="#how">How it works</a>
+        <a href="#questionnaire">Get matched</a>
+        <a href="#mortgage">Mortgage & Insurance</a>
+        <a href="#admin">Data (pilot)</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a href="#questionnaire" class="btn">Find my best match</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="section hero" style="padding-top:32px; padding-bottom:28px;">
+    <div class="container row row-2">
+      <div>
+        <span class="pill">Unbiased – Credit Score Level Ratings</span>
+        <h1 class="h1" style="margin-top:12px;">Find your best-fit real estate agent — privately</h1>
+        <p class="muted" style="margin-top:8px; max-width: 600px;">
+          50+ matching signals (neighborhood, property type, price <strong>range</strong>, buyer/seller focus, marketing power, track record).
+          We present your best 3 matches — with no names or contact shared until <em>both</em> sides opt-in.
+        </p>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <a class="btn" href="#questionnaire">Start 2-minute match</a>
+          <a class="btn btn-outline" href="#how">How it works</a>
+        </div>
+        <!-- (Removed old testimonial box; now overlaid on images) -->
+      </div>
+
+      <!-- Rotating visual with overlaid testimonials -->
+      <div class="hero-visual" id="heroVisual">
+        <div class="hero-img active" id="slide0"
+             style="background-image:
+              linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
+              url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop');">
+        </div>
+        <div class="hero-img" id="slide1"
+             style="background-image:
+              linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
+              url('https://images.unsplash.com/photo-1560518883-90a2e0b8d29d?q=80&w=1600&auto=format&fit=crop');">
+        </div>
+        <div class="hero-img" id="slide2"
+             style="background-image:
+              linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
+              url('https://images.unsplash.com/photo-1560184897-a50f6f7d518f?q=80&w=1600&auto=format&fit=crop');">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-caption" id="heroCaption">
+          <div class="hero-cap-title" id="capTitle">Accepted over ask</div>
+          <div class="hero-cap-sub" id="capSub">Bucktown • SFH • 11 days — “We met three great options anonymously and chose the one who sold our place in 11 days.”</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS (moved upward via tighter padding) -->
+  <section id="how" class="section" style="padding-top:28px;">
+    <div class="container">
+      <h2 class="h2">How it works</h2>
+      <p class="muted" style="margin-top:6px;">Unbiased, data-driven matches. Comfortable, private introductions.</p>
+      <div class="row row-3" style="margin-top:16px;">
+        <div class="card" style="padding:18px;">
+          <div class="chip">1</div>
+          <div class="h3" style="margin-top:8px;">Tell us your goals</div>
+          <div class="small muted">Buyer or seller, neighborhood, property type, price <strong>range</strong>, timing, and key priorities.</div>
+        </div>
+        <div class="card" style="padding:18px;">
+          <div class="chip">2</div>
+          <div class="h3" style="margin-top:8px;">AI-assisted matching</div>
+          <div class="small muted">We weigh 50+ signals to rank agents most likely to achieve your outcome.</div>
+        </div>
+        <div class="card" style="padding:18px;">
+          <div class="chip">3</div>
+          <div class="h3" style="margin-top:8px;">Anonymous introductions</div>
+          <div class="small muted">Review short narratives for your top matches without exposing identity or contact info.</div>
+        </div>
+        <div class="card" style="padding:18px;">
+          <div class="chip">4</div>
+          <div class="h3" style="margin-top:8px;">Mutual opt-in & connect</div>
+          <div class="small muted">If you approve, we open a private chat. When both sides agree, we connect directly.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUESTIONNAIRE -->
+  <section id="questionnaire" class="section">
+    <div class="container">
+      <h2 class="h2">Get matched in under 2 minutes</h2>
+      <p class="muted">We only share anonymized needs until you choose to connect.</p>
+
+      <div class="card" style="margin-top:14px; padding:16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div class="xsmall">Step <span id="step-num">1</span> of 6</div>
+          <div class="progress"><div id="progress-bar" style="width: 16.66%;"></div></div>
+        </div>
+
+        <!-- Step 0 -->
+        <div id="step-0" style="margin-top:12px;">
+          <div class="h3">Are you buying or selling?</div>
+          <div class="grid-2" style="margin-top:10px;">
+            <button class="choice" data-role="Buyer">
+              <div class="h3">Buyer</div>
+              <div class="small muted">We’ll prioritize negotiation and availability.</div>
+            </button>
+            <button class="choice" data-role="Seller">
+              <div class="h3">Seller</div>
+              <div class="small muted">We’ll prioritize marketing power and days-on-market.</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 1 -->
+        <div id="step-1" class="hidden" style="margin-top:12px;">
+          <div class="h3">What neighborhood or area?</div>
+          <input id="input-location" class="input" placeholder="e.g., West Loop, Lincoln Park, Hinsdale"
+                 style="width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px">
+          <div class="xsmall" style="margin-top:6px;">Tip: You can be specific (e.g., “Bucktown”) or broader (e.g., “North Shore”).</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="step-2" class="hidden" style="margin-top:12px;">
+          <div class="h3">Property type</div>
+          <div class="grid-3" style="margin-top:10px;" id="property-types"></div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="step-3" class="hidden" style="margin-top:12px;">
+          <div class="h3">Price range</div>
+          <div class="grid-2" style="margin-top:10px;">
+            <div>
+              <div class="xsmall">Min</div>
+              <input id="price-min" type="number" class="input"
+                     style="width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px"
+                     value="400000">
+            </div>
+            <div>
+              <div class="xsmall">Max</div>
+              <input id="price-max" type="number" class="input"
+                     style="width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px"
+                     value="1000000">
+            </div>
+          </div>
+          <div class="xsmall" style="margin-top:6px;">Change later if you’re uncertain.</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div id="step-4" class="hidden" style="margin-top:12px;">
+          <div class="h3">What matters most?</div>
+          <div id="priorities" class="grid-2" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- Step 5 -->
+        <div id="step-5" class="hidden" style="margin-top:12px;">
+          <div class="h3">Timing</div>
+          <div class="grid-3" style="margin-top:10px;">
+            <button class="choice timing" data-val="0-3 months">0-3 months</button>
+            <button class="choice timing" data-val="3-6 months">3-6 months</button>
+            <button class="choice timing" data-val="6-12 months">6-12 months</button>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+          <button class="btn btn-outline" id="btn-back">Back</button>
+          <button class="btn" id="btn-next">Next</button>
+          <button class="btn hidden" id="btn-finish">See my matches</button>
+        </div>
+        <div class="xsmall" style="margin-top:8px;">Your details remain private. We only open a chat if you approve your matches and the agent agrees.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="section hidden">
+    <div class="container">
+      <h2 class="h2">Your best-fit matches</h2>
+      <p class="muted">We highlight the top three based on your goals. You can still browse up to ten options.</p>
+      <div id="top3" class="row row-3" style="margin-top:16px;"></div>
+      <div style="margin-top:28px;">
+        <div class="h3">Other relevant options</div>
+        <div id="rest" class="row row-3" style="margin-top:12px;"></div>
+      </div>
+
+      <div class="card" style="margin-top:28px; padding:16px; background:var(--soft);">
+        <div class="h3">Mortgage & Insurance (optional)</div>
+        <div class="small muted" style="margin-top:6px;">Prefer a lender or insurance broker style? We’ll factor that into your matches too.</div>
+        <div class="row row-3" style="margin-top:12px;">
+          <label class="small"><input type="checkbox"> I want a rate-shopper lender</label>
+          <label class="small"><input type="checkbox"> I prefer concierge service</label>
+          <label class="small"><input type="checkbox"> I need jumbo loan expertise</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MORTGAGE STRIP -->
+  <section id="mortgage" class="section">
+    <div class="container">
+      <h2 class="h2">Mortgage & Insurance referrals</h2>
+      <p class="muted">When you're ready, we can introduce you to vetted lenders and brokers based on your profile.</p>
+      <div class="row row-3" style="margin-top:12px;">
+        <div class="card" style="padding:16px;">
+          <div class="h3">Rate-first lenders</div>
+          <div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div>
+          <button class="btn" style="margin-top:10px;">Add to my matches</button>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div class="h3">Concierge lenders</div>
+          <div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div>
+          <button class="btn" style="margin-top:10px;">Add to my matches</button>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div class="h3">Insurance brokers</div>
+          <div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div>
+          <button class="btn" style="margin-top:10px;">Add to my matches</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN CSV -->
+  <section id="admin" class="section">
+    <div class="container">
+      <h2 class="h2">Pilot data (CSV import) — Chicagoland</h2>
+      <p class="muted">Paste a simple CSV to test with real-looking agent stats before MLS integration.</p>
+      <div class="card" style="padding:16px; margin-top:12px;">
+        <div class="small">Columns: <code>id, alias, neighborhoods (;), propertyTypes (;), priceMin, priceMax, focus, marketing, negotiation, transactions12m, resources (;), brokerageMarketing, domVsArea, spLpVsArea, buyDiscountVsArea</code></div>
+        <textarea id="csv" class="textarea" rows="8" style="margin-top:10px; width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:12px" placeholder="id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
+X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
+X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
+X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0"></textarea>
+        <div style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+          <button id="load-sample" class="btn btn-outline">Load sample</button>
+          <button id="import" class="btn">Import CSV</button>
+          <span id="status" class="xsmall"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT/FAQ omitted here for brevity; keep your existing ones if present -->
+
+  <footer class="footer">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0;">
+      <div class="xsmall">© <span id="year"></span> Agent Ranks — Demo Concept</div>
+      <div class="xsmall"><a href="#how">How it works</a> · <a href="#faq">FAQ</a> · <a href="#contact">Contact</a></div>
+    </div>
+  </footer>
+
+  <button id="chat-fab" class="btn" title="Open chat">Chat</button>
+  <div id="chat-modal" class="modal hidden" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true" style="width: min(720px, 100%); max-height: 80vh; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border);">
+        <div><div class="xsmall">Anonymous chat</div><div class="h3" id="chat-title">Agent</div></div>
+        <div style="display:flex; gap:8px;"><button class="btn btn-outline" id="chat-min">Minimize</button><button class="btn btn-outline" id="chat-close">Close</button></div>
+      </div>
+      <div id="chat-messages" style="padding:12px; overflow:auto; height: 50vh;"></div>
+      <div style="display:flex; gap:8px; padding:12px; border-top:1px solid var(--border);">
+        <input id="chat-input" class="input" placeholder="Type a message…" style="flex:1; border:1px solid var(--border); border-radius:12px; padding:10px 12px;">
+        <button class="btn" id="chat-send">Send</button>
+      </div>
+      <div class="xsmall" style="padding:10px 12px; border-top:1px solid var(--border);">By continuing, you agree to stay anonymous until both sides opt-in. If an agent accepts, they agree to a 25% referral fee via our standard agreement.</div>
+    </div>
+  </div>
+
+<script>
+  /* -------- Dynamic Rank Badge (circle, number inside) for brand + cards -------- */
+  function createRankBadge(value, { size = 32, mode = 'number', spin = false } = {}) {
+    const v = Math.max(0, Math.min(100, Math.round(value)));
+    const gid = 'g' + Math.random().toString(36).slice(2,7);
+    const navy = '#0B1F3B', gold='#C49A6C', track='#E2E8F0', text='#0F172A';
+    const stroke = Math.max(4, Math.round(size*0.18));
+    const c = size/2, r=(size/2)-(stroke/2)-1;
+    const C = 2*Math.PI*r, target = C*(1 - v/100);
+    const fsz = Math.round(size*0.36); // enough inner whitespace
+    return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-label="Rank ${v}">
+  <defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${navy}"/><stop offset="100%" stop-color="${gold}"/></linearGradient></defs>
+  <circle cx="${c}" cy="${c}" r="${r}" fill="#fff" stroke="${track}" stroke-width="${stroke}"/>
+  <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="url(#${gid})" stroke-width="${stroke}" stroke-linecap="round"
+          stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${target.toFixed(2)}"/>
+  <text x="${c}" y="${c+Math.round(size*0.06)}" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial"
+        font-weight="800" font-size="${fsz}" fill="${text}">${v}</text>
+</svg>`;
+  }
+
+  // Brand badge (logo) +30% at 32px
+  document.getElementById('brand-badge').innerHTML = createRankBadge(98, { size: 32, mode: 'number', spin: false });
+
+  /* -------- HERO rotation with on-image testimonials -------- */
+  const slides = [
+    {
+      el: document.getElementById('slide0'),
+      title: 'Accepted over ask',
+      sub: 'Bucktown • SFH • 11 days — “We met three great options anonymously and chose the one who sold our place in 11 days.”',
+      // Image: handshake at a nice home (for sale)
+      src: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop"
+    },
+    {
+      el: document.getElementById('slide1'),
+      title: 'Keys at the closing table',
+      sub: 'Lincoln Park • Condo • “The match understood we were first-time buyers at $800k. Perfect fit.”',
+      // Image: keys exchange at closing
+      src: "https://images.unsplash.com/photo-1560518883-90a2e0b8d29d?q=80&w=1600&auto=format&fit=crop"
+    },
+    {
+      el: document.getElementById('slide2'),
+      title: 'SOLD — stress-free',
+      sub: 'North Shore • “Zero awkward calls. Just private chat until both sides said yes.”',
+      // Image: sold sign with agent & seller
+      src: "https://images.unsplash.com/photo-1560184897-a50f6f7d518f?q=80&w=1600&auto=format&fit=crop"
+    }
+  ];
+  const capTitle = document.getElementById('capTitle');
+  const capSub = document.getElementById('capSub');
+  let heroIdx = 0;
+  setInterval(() => {
+    slides[heroIdx].el.classList.remove('active');
+    heroIdx = (heroIdx + 1) % slides.length;
+    slides[heroIdx].el.style.backgroundImage =
+      `linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%), url('${slides[heroIdx].src}')`;
+    slides[heroIdx].el.classList.add('active');
+    capTitle.textContent = slides[heroIdx].title;
+    capSub.textContent = slides[heroIdx].sub;
+  }, 3800);
+
+  /* -------- Matching data (sample) -------- */
+  let AGENTS=[
+    {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1},
+    {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0},
+    {id:'A3',alias:'First-Time Buyer Guide',neighborhoods:['Lincoln Square','Ravenswood','Avondale','Logan Square'],propertyTypes:['Condo','Townhome'],priceMin:300000,priceMax:800000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:38,resources:['Lender Intros','Buyer Workshops','Offer Playbooks'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.0},
+    {id:'A4',alias:'Luxury Lakefront Team',neighborhoods:['Gold Coast','Streeterville','Old Town'],propertyTypes:['Condo','Single Family'],priceMin:1200000,priceMax:6000000,focus:'Seller',marketing:5,negotiation:4,transactions12m:29,resources:['International Network','Print Features','Private Showings'],brokerageMarketing:5,domVsArea:-6,spLpVsArea:1.6,buyDiscountVsArea:0.0}
+  ];
+
+  const METRICS={neighborhood:{label:'Neighborhood specialization',weight:{Buyer:.22,Seller:.18}},productType:{label:'Product type fit',weight:{Buyer:.12,Seller:.12}},priceBand:{label:'Price band fit',weight:{Buyer:.12,Seller:.12}},roleFocus:{label:'Buyer/Seller focus',weight:{Buyer:.10,Seller:.10}},resources:{label:'Resources to achieve goals',weight:{Buyer:.18,Seller:.22}},brokerage:{label:'Brokerage marketing power',weight:{Buyer:.08,Seller:.12}},trackRecord:{label:'Success & track record',weight:{Buyer:.18,Seller:.14}}};
+  const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+  function overlapRatio(range,aMin,aMax){ const [pMin,pMax]=range||[0,0]; const inter=Math.max(0,Math.min(pMax,aMax)-Math.max(pMin,aMin)); const uni=Math.max(pMax,aMax)-Math.min(pMin,aMin); return uni>0?inter/uni:0 }
+
+  function scoreAgent(agent,answers){
+    const role=answers.role||'Buyer';
+    const neighborhood=answers.location?(agent.neighborhoods.some(n=>n.toLowerCase().includes(answers.location.toLowerCase()))?1:0):.5;
+    const productType=answers.propertyType?(agent.propertyTypes.includes(answers.propertyType)?1:0):.5;
+    const priceBand=overlapRatio(answers.priceRange,agent.priceMin,agent.priceMax)||.5;
+    const roleFocus=answers.role?(answers.role===agent.focus?1:0):.5;
+    const m=agent.marketing/5, n=agent.negotiation/5;
+    const wantsM=(answers.priorities||[]).includes('Marketing Power'), wantsN=(answers.priorities||[]).includes('Negotiation Strength');
+    const resources=role==='Seller'?clamp(.7*m+.3*n+(wantsM? .1:0)):clamp(.7*n+.3*m+(wantsN? .1:0));
+    const brokerage=agent.brokerageMarketing/5;
+    const activity=Math.min(agent.transactions12m,50)/50;
+    const domScore=role==='Seller'?clamp(.5+(-agent.domVsArea)/30):.5;
+    const spLpScore=role==='Seller'?clamp((agent.spLpVsArea+3)/6):.5;
+    const buyerDiscount=role==='Buyer'?clamp((agent.buyDiscountVsArea+2)/4):.5;
+    const performance=role==='Seller'?clamp(.6*spLpScore+.4*domScore):buyerDiscount;
+    const trackRecord=clamp(.6*performance+.4*activity);
+    const raw={neighborhood,productType,priceBand,roleFocus,resources,brokerage,trackRecord};
+    const parts=Object.entries(METRICS).map(([k,d])=>{ const w=d.weight[role], s=raw[k]??0; return {id:k,label:d.label,weight:w,score:s,points:Math.round(s*w*100)} });
+    const total=parts.reduce((s,p)=>s+p.points,0);
+    return { total, parts, raw }
+  }
+
+  function narrative(agent,answers){
+    const bullets=[];
+    if(answers.location){
+      const locs=agent.neighborhoods.filter(n=>n.toLowerCase().includes(answers.location.toLowerCase())).slice(0,2).join(', ');
+      if(locs) bullets.push('Specializes near '+locs+'.');
+    }
+    if(answers.propertyType) bullets.push('Primary focus: '+answers.propertyType+'.');
+    if(answers.priceRange) bullets.push('Comfortable in your price window ($'+Number(answers.priceRange[0]).toLocaleString()+'–$'+Number(answers.priceRange[1]).toLocaleString()+').');
+    if(answers.role) bullets.push((answers.role==='Buyer'?'Buyer':'Seller')+'-oriented strategies.');
+    if((answers.priorities||[]).includes('Marketing Power')) bullets.push('Strong marketing: '+(agent.resources||[]).slice(0,2).join(', ')+'.');
+    if((answers.priorities||[]).includes('Negotiation Strength')) bullets.push('Known for sharp negotiations.');
+    bullets.push(agent.transactions12m+' closings in last 12 months.');
+    return bullets
+  }
+
+  /* -------- Questionnaire state + fixed interactions -------- */
+  const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
+  const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
+  const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
+  const progressBar=document.getElementById('progress-bar'), stepNum=document.getElementById('step-num');
+  const PROPERTY_TYPES=['Condo','Single Family','Townhome','Loft','Multi-Unit'];
+  const PRIORITIES=['Local Expertise','Marketing Power','Negotiation Strength','New Construction Access','Off-Market Access'];
+  let step=0;
+
+  // Render property types with working selection
+  (function renderPropertyTypeButtons(){
+    const holder=document.getElementById('property-types'); holder.innerHTML='';
+    PROPERTY_TYPES.forEach(pt=>{
+      const btn=document.createElement('button');
+      btn.className='choice'; btn.textContent=pt;
+      btn.onclick=()=>{ state.propertyType=pt; // toggle selected feel (single-select)
+        holder.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+      };
+      holder.appendChild(btn);
+    });
+  })();
+
+  // Render priorities (multi-select)
+  (function renderPriorityCheckboxes(){
+    const holder=document.getElementById('priorities'); holder.innerHTML='';
+    PRIORITIES.forEach(p=>{
+      const btn=document.createElement('button');
+      btn.className='choice'; btn.innerHTML='<span>'+p+'</span>';
+      btn.onclick=()=>{
+        const i=state.priorities.indexOf(p);
+        if(i>=0){ state.priorities.splice(i,1); btn.classList.remove('selected'); }
+        else { state.priorities.push(p); btn.classList.add('selected'); }
+      };
+      holder.appendChild(btn);
+    });
+  })();
+
+  // Role selection
+  document.querySelectorAll('[data-role]').forEach(btn=>{
+    btn.onclick=()=>{ state.role=btn.getAttribute('data-role');
+      document.querySelectorAll('[data-role]').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected'); goStep(1);
+    };
+  });
+
+  // Location & price inputs
+  document.getElementById('input-location').oninput=(e)=>{ state.location=e.target.value||'' };
+  document.getElementById('price-min').oninput=(e)=>{ state.priceRange[0]=+e.target.value||0 };
+  document.getElementById('price-max').oninput=(e)=>{ state.priceRange[1]=+e.target.value||0 };
+
+  // Timing buttons — fixed: selected state + value
+  document.querySelectorAll('.timing').forEach(btn=>{
+    btn.onclick=()=>{ state.timing=btn.getAttribute('data-val');
+      document.querySelectorAll('.timing').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+  });
+
+  function goStep(n){
+    step=n;
+    stepEls.forEach((el,i)=>el.classList.toggle('hidden', i!==step));
+    stepNum.textContent=(step+1);
+    progressBar.style.width=((step+1)/6*100)+'%';
+    backBtn.disabled=(step===0);
+    nextBtn.classList.toggle('hidden', step===5);
+    finishBtn.classList.toggle('hidden', step!==5);
+  }
+  backBtn.onclick=()=>{ if(step>0) goStep(step-1) };
+  nextBtn.onclick=()=>{ if(step<5) goStep(step+1) };
+  finishBtn.onclick=()=>{ document.getElementById('results').classList.remove('hidden'); renderResults(); location.hash='#results' };
+  goStep(0);
+
+  /* -------- Results render (with badge 42px on main cards, 34px on small) -------- */
+  function renderResults(){
+    const sc=AGENTS.map(a=>({agent:a,score:scoreAgent(a,state),bullets:narrative(a,state)})).sort((x,y)=>y.score.total-x.score.total);
+    const top3=sc.slice(0,3), rest=sc.slice(3,10);
+    const topEl=document.getElementById('top3'); topEl.innerHTML='';
+    const restEl=document.getElementById('rest'); restEl.innerHTML='';
+
+    top3.forEach(r=> topEl.appendChild(renderAgentCard(r)));
+    rest.forEach(r=> restEl.appendChild(renderAgentSmall(r)));
+  }
+  function renderAgentCard(r){
+    const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='14px';
+    const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
+    head.innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${createRankBadge(r.score.total, { size: 42, mode: 'number' })}
+        <div>
+          <div class="xsmall">Top Match</div>
+          <div class="h3">${r.agent.alias}</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:24px; font-weight:800;">${r.score.total}</div>
+        <div class="xsmall">Fit score</div>
+      </div>`;
+    wrap.appendChild(head);
+
+    const ul=document.createElement('ul'); ul.className='list small'; ul.style.marginTop='8px';
+    r.bullets.forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
+    wrap.appendChild(ul);
+
+    const pillbar=document.createElement('div'); pillbar.className='pillbar'; pillbar.style.marginTop='8px';
+    r.agent.propertyTypes.forEach(t=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=t; pillbar.appendChild(s) });
+    const f=document.createElement('span'); f.className='chip'; f.textContent=r.agent.focus+' focus'; pillbar.appendChild(f);
+    wrap.appendChild(pillbar);
+
+    const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='10px'; actions.style.marginTop='10px';
+    const btnChat=document.createElement('button'); btnChat.className='btn'; btnChat.textContent='Open anonymous chat';
+    const btnSave=document.createElement('button'); btnSave.className='btn btn-outline'; btnSave.textContent='Save for later';
+    actions.appendChild(btnChat); actions.appendChild(btnSave); wrap.appendChild(actions);
+    const note=document.createElement('div'); note.className='xsmall'; note.style.marginTop='6px'; note.textContent='No names or contact details shown. If both sides opt-in, we’ll connect you directly.'; wrap.appendChild(note);
+    btnChat.onclick=()=> openChat(r.agent);
+    return wrap;
+  }
+  function renderAgentSmall(r){
+    const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='12px';
+    const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between';
+    head.innerHTML=`
+      <div class="small" style="font-weight:700; display:flex; align-items:center; gap:8px;">
+        ${createRankBadge(r.score.total, { size: 34, mode: 'number' })}
+        ${r.agent.alias}
+      </div>
+      <div class="small" style="font-weight:700;">${r.score.total}</div>`;
+    wrap.appendChild(head);
+    const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style.marginTop='6px';
+    r.bullets.slice(0,3).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
+    const btn=document.createElement('button'); btn.className='btn'; btn.style.width='100%'; btn.style.marginTop='8px'; btn.textContent='Chat anonymously'; btn.onclick=()=> openChat(r.agent);
+    wrap.appendChild(ul); wrap.appendChild(btn);
+    return wrap;
+  }
+
+  /* -------- Chat controls -------- */
+  const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatMin=document.getElementById('chat-min'); const chatFab=document.getElementById('chat-fab');
+  function openChat(agent){
+    document.getElementById('chat-title').textContent=agent.alias;
+    const msgs=document.getElementById('chat-messages'); msgs.innerHTML='';
+    const seed=[{who:'system',text:"Anonymous chat created. Share only what you're comfortable with."},{who:agent.alias,text:`Hi! I can advise on ${(state.propertyType||'your goals').toLowerCase()} in ${state.location || 'your area'}.`}];
+    seed.forEach(m=>appendMsg(m.who,m.text)); showModal();
+  }
+  function showModal(){ modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false'); document.getElementById('chat-input').focus() }
+  function hideModal(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true') }
+  function appendMsg(who,text){
+    const box=document.createElement('div');
+    box.className='card'; box.style.padding='8px 10px'; box.style.maxWidth='80%'; box.style.margin='6px 0';
+    if(who==='You'){ box.style.marginLeft='auto'; box.style.background='#111827'; box.style.color='#fff' }
+    const whoEl=document.createElement('div'); whoEl.className='xsmall'; whoEl.textContent=who;
+    const textEl=document.createElement('div'); textEl.className='small'; textEl.style.marginTop='4px'; textEl.textContent=text;
+    box.appendChild(whoEl); box.appendChild(textEl);
+    const msgs=document.getElementById('chat-messages'); msgs.appendChild(box); msgs.scrollTop=msgs.scrollHeight;
+  }
+  document.getElementById('chat-send').onclick=()=>{ const inp=document.getElementById('chat-input'); const t=(inp.value||'').trim(); if(!t) return; appendMsg('You',t); inp.value='' };
+  chatClose.onclick=hideModal; chatMin.onclick=hideModal; modal.addEventListener('click',e=>{ if(e.target===modal) hideModal() }); document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideModal() });
+  chatFab.onclick=()=>{ if(modal.classList.contains('hidden')){ document.getElementById('chat-title').textContent='Agent'; const msgs=document.getElementById('chat-messages'); msgs.innerHTML=''; appendMsg('system',"Anonymous chat created. Share only what you're comfortable with."); showModal() } else { hideModal() } };
+
+  /* -------- CSV pilot -------- */
+  document.getElementById('load-sample').onclick=()=>{ const sample=`id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
+X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
+X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
+X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0`; document.getElementById('csv').value=sample; document.getElementById('status').textContent='Loaded sample. You can modify before importing.' };
+  document.getElementById('import').onclick=()=>{ try{ const txt=document.getElementById('csv').value||''; const lines=txt.trim().split(/\r?\n/); if(lines.length<2){ document.getElementById('status').textContent='No rows detected. Check your CSV.'; return } const headers=lines[0].split(',').map(h=>h.trim()); const rows=[]; for(let i=1;i<lines.length;i++){ if(!lines[i].trim()) continue; const cols=lines[i].split(',').map(c=>c.trim()); const obj={}; headers.forEach((h,idx)=>obj[h]=cols[idx]??''); const toList=v=>v?v.split(/;|\|/).map(x=>x.trim()).filter(Boolean):[]; rows.push({ id:obj.id||'R'+i, alias:obj.alias||('Agent '+i), neighborhoods:toList(obj.neighborhoods), propertyTypes:toList(obj.propertyTypes), priceMin:parseFloat(obj.priceMin||0), priceMax:parseFloat(obj.priceMax||0), focus:(obj.focus||'Seller').trim(), marketing:parseInt(obj.marketing||3), negotiation:parseInt(obj.negotiation||3), transactions12m:parseInt(obj.transactions12m||0), resources:toList(obj.resources), brokerageMarketing:parseInt(obj.brokerageMarketing||3), domVsArea:parseFloat(obj.domVsArea||0), spLpVsArea:parseFloat(obj.spLpVsArea||0), buyDiscountVsArea:parseFloat(obj.buyDiscountVsArea||0) }) } AGENTS=rows; document.getElementById('status').textContent='Imported '+rows.length+' agents. Matches now use your data.'; document.getElementById('results').classList.remove('hidden'); renderResults(); location.hash='#results' } catch(e){ document.getElementById('status').textContent='Import error. Please check formatting.' } };
+
+  document.getElementById('year').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
+!doctype html>
+<html lang="en">
+<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Agent Ranks — Confidential Agent Matching (with Dynamic Rank Badge)</title>
