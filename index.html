@@ -3,76 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agent Ranks — Confidential Agent Matching</title>
+<title>Agent Ranks — Private, Unbiased Agent Matching</title>
 <style>
   :root{
     --navy:#0B1F3B; --gold:#C49A6C; --ink:#0F172A; --muted:#475569; --border:#E2E8F0; --soft:#F8FAFC; --bg:#FFFFFF;
-    --shadow:0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.06);
-    --radius:14px;
+    --shadow:0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.06); --radius:14px;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:var(--ink); background:var(--bg)}
-  a{color:var(--ink); text-decoration:none}
-  .container{max-width:1100px; margin:0 auto; padding:0 16px}
-  .btn{background:var(--ink); color:#fff; border:0; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer}
-  .btn-outline{background:#fff; color:var(--ink); border:1px solid var(--border); border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer}
-  .card{background:#fff; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow)}
-  .section{padding:48px 0} /* tightened from 64px to move content up */
-  .h1{font-size:40px; line-height:1.1; font-weight:800; letter-spacing:-.02em}
-  .h2{font-size:28px; font-weight:800; letter-spacing:-.02em}
-  .h3{font-size:16px; font-weight:800}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);background:var(--bg)}
+  a{color:var(--ink);text-decoration:none}
+  .container{max-width:1100px;margin:0 auto;padding:0 16px}
+  .btn{background:var(--ink);color:#fff;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+  .btn-outline{background:#fff;color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+  .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .section{padding:48px 0} /* tightened to lift content */
+  .h1{font-size:40px;line-height:1.1;font-weight:800;letter-spacing:-.02em}
+  .h2{font-size:28px;font-weight:800;letter-spacing:-.02em}
+  .h3{font-size:16px;font-weight:800}
   .muted{color:var(--muted)}
-  .row{display:grid; grid-template-columns:1fr; gap:16px}
+  .row{display:grid;grid-template-columns:1fr;gap:16px}
   @media(min-width:720px){ .row-2{grid-template-columns:1.2fr .8fr} .row-3{grid-template-columns:repeat(3,1fr)} }
-  header{position:sticky; top:0; background:rgba(255,255,255,.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); z-index:50}
-  nav a{margin-right:16px; font-size:14px}
-  .pill{display:inline-flex; padding:6px 12px; border-radius:999px; border:1px solid rgba(17,24,39,.15); background:rgba(17,24,39,.03); font-size:12px; font-weight:700}
-  .hero-visual{height:320px; border-radius:16px; border:1px solid var(--border); overflow:hidden; position:relative}
-  .hero-img{position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity .6s}
+  header{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:50}
+  nav a{margin-right:16px;font-size:14px}
+  .pill{display:inline-flex;padding:6px 12px;border-radius:999px;border:1px solid rgba(17,24,39,.15);background:rgba(17,24,39,.03);font-size:12px;font-weight:700}
+  .hero-visual{height:320px;border-radius:16px;border:1px solid var(--border);overflow:hidden;position:relative}
+  .hero-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .6s}
   .hero-img.active{opacity:1}
-  .hero-overlay{
-    position:absolute; inset:0;
-    background:linear-gradient(180deg, rgba(0,0,0,.0) 35%, rgba(0,0,0,.55) 100%);
-  }
-  .hero-caption{
-    position:absolute; left:16px; right:16px; bottom:16px; color:#fff;
-    text-shadow:0 1px 2px rgba(0,0,0,.6);
-  }
-  .hero-cap-title{font-weight:800; font-size:16px; letter-spacing:.01em}
-  .hero-cap-sub{font-size:12px; opacity:.9}
-  .progress{height:8px; width:180px; background:#f1f5f9; border-radius:999px; overflow:hidden}
-  .progress>div{height:100%; background:var(--ink)}
-  .grid-2{display:grid; grid-template-columns:1fr; gap:12px}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.55) 100%)}
+  .hero-caption{position:absolute;left:16px;right:16px;bottom:16px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+  .hero-cap-title{font-weight:800;font-size:16px;letter-spacing:.01em}
+  .hero-cap-sub{font-size:12px;opacity:.9}
+  .progress{height:8px;width:180px;background:#f1f5f9;border-radius:999px;overflow:hidden}
+  .progress>div{height:100%;background:var(--ink)}
+  .grid-2{display:grid;grid-template-columns:1fr;gap:12px}
   @media(min-width:700px){ .grid-2{grid-template-columns:repeat(2,1fr)} }
-  .grid-3{display:grid; grid-template-columns:1fr; gap:12px}
+  .grid-3{display:grid;grid-template-columns:1fr;gap:12px}
   @media(min-width:700px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
-  .list{list-style:disc; padding-left:18px}
-  .small{font-size:12px} .xsmall{font-size:11px; color:#64748b}
-  .pillbar{display:flex; gap:8px; flex-wrap:wrap}
-  .choice{padding:12px; border:1px solid var(--border); border-radius:12px; background:#fff; text-align:left; cursor:pointer}
-  .choice.selected{border-color:var(--ink); background:#111827; color:#fff}
+  .list{list-style:disc;padding-left:18px}
+  .small{font-size:12px} .xsmall{font-size:11px;color:#64748b}
+  .pillbar{display:flex;gap:8px;flex-wrap:wrap}
+  .choice{padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff;text-align:left;cursor:pointer}
+  .choice.selected{border-color:var(--ink);background:#111827;color:#fff}
   .choice.selected .muted{color:#e5e7eb}
   .hidden{display:none}
-  .footer{border-top:1px solid var(--border); background:#fff}
-  #chat-fab{position:fixed; right:18px; bottom:18px; z-index:60}
-  /* Critical: ensure modal can be hidden over .modal display:flex */
-  .modal.hidden, .hidden, #chat-modal[aria-hidden="true"]{display:none !important}
-  .modal{position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100}
-  /* Mobile tweaks */
-  @media(max-width:480px){
-    .h1{font-size:32px}
-    .h2{font-size:24px}
-    .brand-name{font-size:1.3em} /* 30% larger name still scales down */
-    .hero-visual{height:260px}
-  }
+  .footer{border-top:1px solid var(--border);background:#fff}
+  #chat-fab{position:fixed;right:18px;bottom:18px;z-index:60}
+  .modal.hidden,.hidden,#chat-modal[aria-hidden="true"]{display:none !important}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
+  @media(max-width:480px){ .h1{font-size:32px} .h2{font-size:24px} .brand-name{font-size:1.3em} .hero-visual{height:260px} }
 </style>
 </head>
 <body>
   <!-- HEADER -->
   <header>
-    <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px;">
-      <div style="display:flex; align-items:center; gap:10px;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
+      <div style="display:flex;align-items:center;gap:10px;">
         <!-- Brand badge +30% (32px) -->
         <span id="brand-badge" aria-hidden="true"></span>
         <strong class="brand-name" style="font-size:1.3em">Agent Ranks</strong>
@@ -82,49 +67,36 @@
         <a href="#questionnaire">Get matched</a>
         <a href="#mortgage">Mortgage & Insurance</a>
         <a href="#admin">Data (pilot)</a>
-        <a href="#faq">FAQ</a>
-        <a href="#contact">Contact</a>
+        <a href="#legal">Policies</a>
+        <a href="#broker">Brokerage Program</a>
       </nav>
       <a href="#questionnaire" class="btn">Find my best match</a>
     </div>
   </header>
 
   <!-- HERO -->
-  <section class="section hero" style="padding-top:32px; padding-bottom:28px;">
+  <section class="section hero" style="padding-top:32px;padding-bottom:28px;">
     <div class="container row row-2">
       <div>
         <span class="pill">Unbiased – Credit Score Level Ratings</span>
         <h1 class="h1" style="margin-top:12px;">Find your best-fit real estate agent — privately</h1>
-        <p class="muted" style="margin-top:8px; max-width: 600px;">
+        <p class="muted" style="margin-top:8px;max-width:600px;">
           50+ matching signals (neighborhood, property type, price <strong>range</strong>, buyer/seller focus, marketing power, track record).
           We present your best 3 matches — with no names or contact shared until <em>both</em> sides opt-in.
         </p>
-        <div style="display:flex; gap:10px; margin-top:16px;">
+        <div style="display:flex;gap:10px;margin-top:16px;">
           <a class="btn" href="#questionnaire">Start 2-minute match</a>
           <a class="btn btn-outline" href="#how">How it works</a>
         </div>
-        <!-- (Removed old testimonial box; now overlaid on images) -->
       </div>
 
-      <!-- Rotating visual with overlaid testimonials -->
-      <div class="hero-visual" id="heroVisual">
-        <div class="hero-img active" id="slide0"
-             style="background-image:
-              linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
-              url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop');">
-        </div>
-        <div class="hero-img" id="slide1"
-             style="background-image:
-              linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
-              url('https://images.unsplash.com/photo-1560518883-90a2e0b8d29d?q=80&w=1600&auto=format&fit=crop');">
-        </div>
-        <div class="hero-img" id="slide2"
-             style="background-image:
-              linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
-              url('https://images.unsplash.com/photo-1560184897-a50f6f7d518f?q=80&w=1600&auto=format&fit=crop');">
-        </div>
+      <!-- Rotating visual with on-image testimonials -->
+      <div class="hero-visual">
+        <div class="hero-img active" id="slide0"></div>
+        <div class="hero-img" id="slide1"></div>
+        <div class="hero-img" id="slide2"></div>
         <div class="hero-overlay"></div>
-        <div class="hero-caption" id="heroCaption">
+        <div class="hero-caption">
           <div class="hero-cap-title" id="capTitle">Accepted over ask</div>
           <div class="hero-cap-sub" id="capSub">Bucktown • SFH • 11 days — “We met three great options anonymously and chose the one who sold our place in 11 days.”</div>
         </div>
@@ -132,32 +104,16 @@
     </div>
   </section>
 
-  <!-- HOW IT WORKS (moved upward via tighter padding) -->
+  <!-- HOW IT WORKS -->
   <section id="how" class="section" style="padding-top:28px;">
     <div class="container">
       <h2 class="h2">How it works</h2>
       <p class="muted" style="margin-top:6px;">Unbiased, data-driven matches. Comfortable, private introductions.</p>
       <div class="row row-3" style="margin-top:16px;">
-        <div class="card" style="padding:18px;">
-          <div class="chip">1</div>
-          <div class="h3" style="margin-top:8px;">Tell us your goals</div>
-          <div class="small muted">Buyer or seller, neighborhood, property type, price <strong>range</strong>, timing, and key priorities.</div>
-        </div>
-        <div class="card" style="padding:18px;">
-          <div class="chip">2</div>
-          <div class="h3" style="margin-top:8px;">AI-assisted matching</div>
-          <div class="small muted">We weigh 50+ signals to rank agents most likely to achieve your outcome.</div>
-        </div>
-        <div class="card" style="padding:18px;">
-          <div class="chip">3</div>
-          <div class="h3" style="margin-top:8px;">Anonymous introductions</div>
-          <div class="small muted">Review short narratives for your top matches without exposing identity or contact info.</div>
-        </div>
-        <div class="card" style="padding:18px;">
-          <div class="chip">4</div>
-          <div class="h3" style="margin-top:8px;">Mutual opt-in & connect</div>
-          <div class="small muted">If you approve, we open a private chat. When both sides agree, we connect directly.</div>
-        </div>
+        <div class="card" style="padding:18px;"><div class="chip">1</div><div class="h3" style="margin-top:8px;">Tell us your goals</div><div class="small muted">Buyer or seller, neighborhood, property type, price <strong>range</strong>, timing, and key priorities.</div></div>
+        <div class="card" style="padding:18px;"><div class="chip">2</div><div class="h3" style="margin-top:8px;">AI-assisted matching</div><div class="small muted">We weigh 50+ signals to rank agents most likely to achieve your outcome.</div></div>
+        <div class="card" style="padding:18px;"><div class="chip">3</div><div class="h3" style="margin-top:8px;">Anonymous introductions</div><div class="small muted">Review short narratives for your top matches without exposing identity or contact info.</div></div>
+        <div class="card" style="padding:18px;"><div class="chip">4</div><div class="h3" style="margin-top:8px;">Mutual opt-in & connect</div><div class="small muted">If you approve, we reveal identities and open private chat. We request payment via Direction to Pay at close.</div></div>
       </div>
     </div>
   </section>
@@ -168,24 +124,18 @@
       <h2 class="h2">Get matched in under 2 minutes</h2>
       <p class="muted">We only share anonymized needs until you choose to connect.</p>
 
-      <div class="card" style="margin-top:14px; padding:16px;">
-        <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="card" style="margin-top:14px;padding:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
           <div class="xsmall">Step <span id="step-num">1</span> of 6</div>
-          <div class="progress"><div id="progress-bar" style="width: 16.66%;"></div></div>
+          <div class="progress"><div id="progress-bar" style="width:16.66%"></div></div>
         </div>
 
         <!-- Step 0 -->
         <div id="step-0" style="margin-top:12px;">
           <div class="h3">Are you buying or selling?</div>
           <div class="grid-2" style="margin-top:10px;">
-            <button class="choice" data-role="Buyer">
-              <div class="h3">Buyer</div>
-              <div class="small muted">We’ll prioritize negotiation and availability.</div>
-            </button>
-            <button class="choice" data-role="Seller">
-              <div class="h3">Seller</div>
-              <div class="small muted">We’ll prioritize marketing power and days-on-market.</div>
-            </button>
+            <button class="choice" data-role="Buyer"><div class="h3">Buyer</div><div class="small muted">We’ll prioritize negotiation and availability.</div></button>
+            <button class="choice" data-role="Seller"><div class="h3">Seller</div><div class="small muted">We’ll prioritize marketing power and days-on-market.</div></button>
           </div>
         </div>
 
@@ -193,7 +143,7 @@
         <div id="step-1" class="hidden" style="margin-top:12px;">
           <div class="h3">What neighborhood or area?</div>
           <input id="input-location" class="input" placeholder="e.g., West Loop, Lincoln Park, Hinsdale"
-                 style="width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px">
+                 style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px">
           <div class="xsmall" style="margin-top:6px;">Tip: You can be specific (e.g., “Bucktown”) or broader (e.g., “North Shore”).</div>
         </div>
 
@@ -207,18 +157,8 @@
         <div id="step-3" class="hidden" style="margin-top:12px;">
           <div class="h3">Price range</div>
           <div class="grid-2" style="margin-top:10px;">
-            <div>
-              <div class="xsmall">Min</div>
-              <input id="price-min" type="number" class="input"
-                     style="width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px"
-                     value="400000">
-            </div>
-            <div>
-              <div class="xsmall">Max</div>
-              <input id="price-max" type="number" class="input"
-                     style="width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px"
-                     value="1000000">
-            </div>
+            <div><div class="xsmall">Min</div><input id="price-min" type="number" class="input" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px" value="400000"></div>
+            <div><div class="xsmall">Max</div><input id="price-max" type="number" class="input" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px" value="1000000"></div>
           </div>
           <div class="xsmall" style="margin-top:6px;">Change later if you’re uncertain.</div>
         </div>
@@ -240,7 +180,7 @@
         </div>
 
         <!-- Controls -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
           <button class="btn btn-outline" id="btn-back">Back</button>
           <button class="btn" id="btn-next">Next</button>
           <button class="btn hidden" id="btn-finish">See my matches</button>
@@ -256,12 +196,9 @@
       <h2 class="h2">Your best-fit matches</h2>
       <p class="muted">We highlight the top three based on your goals. You can still browse up to ten options.</p>
       <div id="top3" class="row row-3" style="margin-top:16px;"></div>
-      <div style="margin-top:28px;">
-        <div class="h3">Other relevant options</div>
-        <div id="rest" class="row row-3" style="margin-top:12px;"></div>
-      </div>
+      <div style="margin-top:28px;"><div class="h3">Other relevant options</div><div id="rest" class="row row-3" style="margin-top:12px;"></div></div>
 
-      <div class="card" style="margin-top:28px; padding:16px; background:var(--soft);">
+      <div class="card" style="margin-top:28px;padding:16px;background:var(--soft);">
         <div class="h3">Mortgage & Insurance (optional)</div>
         <div class="small muted" style="margin-top:6px;">Prefer a lender or insurance broker style? We’ll factor that into your matches too.</div>
         <div class="row row-3" style="margin-top:12px;">
@@ -279,21 +216,9 @@
       <h2 class="h2">Mortgage & Insurance referrals</h2>
       <p class="muted">When you're ready, we can introduce you to vetted lenders and brokers based on your profile.</p>
       <div class="row row-3" style="margin-top:12px;">
-        <div class="card" style="padding:16px;">
-          <div class="h3">Rate-first lenders</div>
-          <div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div>
-          <button class="btn" style="margin-top:10px;">Add to my matches</button>
-        </div>
-        <div class="card" style="padding:16px;">
-          <div class="h3">Concierge lenders</div>
-          <div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div>
-          <button class="btn" style="margin-top:10px;">Add to my matches</button>
-        </div>
-        <div class="card" style="padding:16px;">
-          <div class="h3">Insurance brokers</div>
-          <div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div>
-          <button class="btn" style="margin-top:10px;">Add to my matches</button>
-        </div>
+        <div class="card" style="padding:16px;"><div class="h3">Rate-first lenders</div><div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div><button class="btn" style="margin-top:10px;">Add to my matches</button></div>
+        <div class="card" style="padding:16px;"><div class="h3">Concierge lenders</div><div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div><button class="btn" style="margin-top:10px;">Add to my matches</button></div>
+        <div class="card" style="padding:16px;"><div class="h3">Insurance brokers</div><div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div><button class="btn" style="margin-top:10px;">Add to my matches</button></div>
       </div>
     </div>
   </section>
@@ -303,13 +228,13 @@
     <div class="container">
       <h2 class="h2">Pilot data (CSV import) — Chicagoland</h2>
       <p class="muted">Paste a simple CSV to test with real-looking agent stats before MLS integration.</p>
-      <div class="card" style="padding:16px; margin-top:12px;">
+      <div class="card" style="padding:16px;margin-top:12px;">
         <div class="small">Columns: <code>id, alias, neighborhoods (;), propertyTypes (;), priceMin, priceMax, focus, marketing, negotiation, transactions12m, resources (;), brokerageMarketing, domVsArea, spLpVsArea, buyDiscountVsArea</code></div>
-        <textarea id="csv" class="textarea" rows="8" style="margin-top:10px; width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:12px" placeholder="id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
+        <textarea id="csv" rows="8" style="margin-top:10px;width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:12px" placeholder="id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
 X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
 X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
 X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0"></textarea>
-        <div style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+        <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
           <button id="load-sample" class="btn btn-outline">Load sample</button>
           <button id="import" class="btn">Import CSV</button>
           <span id="status" class="xsmall"></span>
@@ -318,753 +243,391 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
     </div>
   </section>
 
-  <!-- CONTACT/FAQ omitted here for brevity; keep your existing ones if present -->
+  <!-- POLICIES / AGREEMENTS -->
+  <section id="legal" class="section">
+    <div class="container">
+      <h2 class="h2">Policies & Agreements</h2>
+      <details class="card" style="padding:14px;margin-top:12px;"><summary class="h3">Scoring Policy (summary)</summary>
+        <p class="small" style="margin-top:8px">
+          We score agents using 50+ signals: neighborhood specialization, property type fit, price range overlap, buyer/seller focus,
+          resources (marketing & negotiation), brokerage marketing power, and success & track record (seller: DOM & SP/LP vs area; buyer: price improvement vs area).
+          Scores are normalized; responsiveness and reliability can adjust the total. We do not accept pay-to-rank. If a top match is outside our eligible pool
+          (no referral agreement yet), we will attempt to onboard them within hours; otherwise we present the next closest eligible match.
+        </p>
+      </details>
+      <details class="card" style="padding:14px;margin-top:12px;"><summary class="h3">Privacy (summary)</summary>
+        <p class="small" style="margin-top:8px">
+          We collect minimal data (email/mobile) to register you as a Protected Lead (PLID). We do not reveal your identity or contact
+          information to any agent until you tap Connect and the agent accepts our terms. We store timestamps and limited metadata to
+          protect introductions and to improve the service. We do not sell personal data.
+        </p>
+      </details>
+      <details class="card" style="padding:14px;margin-top:12px;"><summary class="h3">Affiliation Disclosure</summary>
+        <p class="small" style="margin-top:8px">
+          Agent Ranks is operated independently and scores agents without brokerage preference. Ownership and management are structured
+          to avoid conflicts; no brokerage receives favorable weighting. An external advisor may review our scoring changes periodically.
+        </p>
+      </details>
 
+      <details class="card" style="padding:14px;margin-top:12px;"><summary class="h3">Program Participation Agreement (draft)</summary>
+        <pre class="small" style="white-space:pre-wrap">
+PROGRAM PARTICIPATION AGREEMENT (DRAFT SUMMARY)
+1. Fee. Agent agrees to pay Agent Ranks (“AR”) a referral fee equal to 25% of agent-side GCI for each Protected Lead that closes.
+2. Protected Lead. A client introduced by AR (PLID) for 24 months from first introduction, covering any property within the stated markets.
+3. Direction to Pay. Agent instructs title/closing attorney to disburse AR’s fee on the settlement statement or by separate invoice.
+4. Survival & Portability. Obligations survive brokerage changes; Agent will provide updated Direction to Pay within 3 business days of any move.
+5. Notification & Audit. Agent will notify AR upon contract and provide closing contact info; AR may request reasonable documentation to confirm close.
+6. Late & Costs. Late amounts accrue interest; reasonable attorneys’ fees and collections costs are recoverable.
+7. Non-Circumvention. Agent shall not circumvent AR’s role; agreed remedies apply (to be finalized by counsel).
+8. Data & Privacy. Minimal data used for the introduction and administration; confidentiality applies.
+(Full-length agreement to be finalized by counsel.)
+        </pre>
+      </details>
+
+      <details class="card" style="padding:14px;margin-top:12px;"><summary class="h3">Direction to Pay (draft)</summary>
+        <pre class="small" style="white-space:pre-wrap">
+DIRECTION TO PAY (DRAFT)
+To: Settlement/Closing Agent
+Please disburse at closing to Agent Ranks [legal name] an amount equal to 25% of the agent-side gross commission (GCI) in connection with the transaction involving [Property Address] on [Close Date]. Agent acknowledges their Program Participation Agreement with Agent Ranks. This Direction to Pay shall appear on the settlement statement or be paid by separate invoice at closing.
+        </pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- BROKERAGE PROGRAM -->
+  <section id="broker" class="section">
+    <div class="container">
+      <h2 class="h2">Brokerage Program (optional)</h2>
+      <div class="card" style="padding:14px;margin-top:12px;">
+        <p class="small"><strong>Offer:</strong> One standing Direction to Pay + PPA addendum covers your roster. We remain neutral in scoring; you gain more closed sides without retainers.</p>
+        <details style="margin-top:8px;"><summary class="h3">Outreach — Email to Brokerage</summary>
+          <pre class="small" style="white-space:pre-wrap">
+Subject: Introductions that close — at no retainer
+Hi [Broker Owner],
+Agent Ranks privately matches consumers with top-fit agents based on performance & fit signals (not pay-to-play). We’d like to include [Brokerage] agents in our eligible pool. There’s no cost; we use a standard referral fee via Direction to Pay at closing. Happy to share a sample dashboard and coverage gaps we can fill together. Interested in a quick intro?
+Best, Agent Ranks
+          </pre>
+        </details>
+        <details style="margin-top:8px;"><summary class="h3">Outreach — SMS to Agent</summary>
+          <pre class="small" style="white-space:pre-wrap">
+Hi [First], you’re ranking high for [Area/Type]. A buyer/seller match is pending. Tap to accept our standard PPA (25% at close via DTP) so we can introduce now: [secure link]
+          </pre>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer class="footer">
-    <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;">
       <div class="xsmall">© <span id="year"></span> Agent Ranks — Demo Concept</div>
-      <div class="xsmall"><a href="#how">How it works</a> · <a href="#faq">FAQ</a> · <a href="#contact">Contact</a></div>
+      <div class="xsmall"><a href="#how">How it works</a> · <a href="#legal">Policies</a> · <a href="#broker">Brokerage Program</a></div>
     </div>
   </footer>
 
+  <!-- ACTION BUTTONS / MODALS -->
   <button id="chat-fab" class="btn" title="Open chat">Chat</button>
+
+  <!-- Chat Modal -->
   <div id="chat-modal" class="modal hidden" aria-hidden="true">
-    <div class="card" role="dialog" aria-modal="true" style="width: min(720px, 100%); max-height: 80vh; display:flex; flex-direction:column;">
-      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border);">
+    <div class="card" role="dialog" aria-modal="true" style="width:min(720px,100%);max-height:80vh;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);">
         <div><div class="xsmall">Anonymous chat</div><div class="h3" id="chat-title">Agent</div></div>
-        <div style="display:flex; gap:8px;"><button class="btn btn-outline" id="chat-min">Minimize</button><button class="btn btn-outline" id="chat-close">Close</button></div>
+        <div style="display:flex;gap:8px;"><button class="btn btn-outline" id="chat-min">Minimize</button><button class="btn btn-outline" id="chat-close">Close</button></div>
       </div>
-      <div id="chat-messages" style="padding:12px; overflow:auto; height: 50vh;"></div>
-      <div style="display:flex; gap:8px; padding:12px; border-top:1px solid var(--border);">
-        <input id="chat-input" class="input" placeholder="Type a message…" style="flex:1; border:1px solid var(--border); border-radius:12px; padding:10px 12px;">
+      <div id="chat-messages" style="padding:12px;overflow:auto;height:50vh;"></div>
+      <div style="display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);">
+        <input id="chat-input" class="input" placeholder="Type a message…" style="flex:1;border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
         <button class="btn" id="chat-send">Send</button>
       </div>
-      <div class="xsmall" style="padding:10px 12px; border-top:1px solid var(--border);">By continuing, you agree to stay anonymous until both sides opt-in. If an agent accepts, they agree to a 25% referral fee via our standard agreement.</div>
+      <div class="xsmall" style="padding:10px 12px;border-top:1px solid var(--border);">By continuing, you agree to stay anonymous until both sides opt-in. If an agent accepts, they agree to a 25% referral fee via our standard agreement.</div>
+    </div>
+  </div>
+
+  <!-- Client Consent / PLID Modal -->
+  <div id="client-consent-modal" class="modal hidden" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true" style="width:min(520px,100%);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);">
+        <div class="h3">Before we introduce you</div>
+        <button class="btn btn-outline" id="client-consent-close">Close</button>
+      </div>
+      <div style="padding:14px;">
+        <p class="small">We keep your details private. We only reveal contact when <em>both</em> you and the agent opt-in.</p>
+        <div style="display:grid;gap:10px;margin-top:10px;">
+          <div><div class="xsmall">Email</div><input id="cc-email" class="input" placeholder="you@email.com"
+               style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;"></div>
+          <div><div class="xsmall">Mobile</div><input id="cc-phone" class="input" placeholder="+1 312-555-0199"
+               style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;"></div>
+          <label class="small" style="display:flex;gap:8px;align-items:center;">
+            <input type="checkbox" id="cc-consent"> I agree to be registered as a protected lead so Agent Ranks can facilitate the introduction and referral terms.
+          </label>
+          <button class="btn" id="cc-continue">Continue</button>
+          <div class="xsmall" id="cc-error" style="color:#b91c1c;display:none;">Please fill email, mobile, and consent.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deal Intake Modal -->
+  <div id="deal-intake-modal" class="modal hidden" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true" style="width:min(640px,100%);max-height:84vh;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);">
+        <div class="h3">Deal Intake</div>
+        <button class="btn btn-outline" id="di-close">Close</button>
+      </div>
+      <div style="padding:14px;overflow:auto;">
+        <div class="grid-2">
+          <div><div class="xsmall">Representation</div>
+            <select id="di-side" class="input" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
+              <option>Seller</option><option>Buyer</option>
+            </select>
+          </div>
+          <div><div class="xsmall">Property Type</div>
+            <input id="di-type" class="input" placeholder="Condo / SFH / Townhome / etc." style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
+          </div>
+          <div><div class="xsmall">Property Address</div>
+            <input id="di-address" class="input" placeholder="123 Main St, City" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
+          </div>
+          <div><div class="xsmall">Expected Close Date</div>
+            <input id="di-close" type="date" class="input" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
+          </div>
+          <div><div class="xsmall">Closing Attorney / Title Co.</div>
+            <input id="di-title" class="input" placeholder="Firm name + contact" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
+          </div>
+          <div><div class="xsmall">Notes</div>
+            <input id="di-notes" class="input" placeholder="Any notes…" style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn" id="di-save">Save intake</button>
+          <button class="btn btn-outline" id="di-generate-dtp">Generate Direction to Pay</button>
+        </div>
+        <div class="xsmall" id="di-status" style="margin-top:8px;"></div>
+        <hr style="margin:16px 0;">
+        <div class="h3">Milestones</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <button class="btn btn-outline ms-btn" data-ms="offer">Offer accepted</button>
+          <button class="btn btn-outline ms-btn" data-ms="pending">Pending</button>
+          <button class="btn btn-outline ms-btn" data-ms="ctc">Clear to close</button>
+          <button class="btn btn-outline ms-btn" data-ms="closed">Closed</button>
+        </div>
+      </div>
     </div>
   </div>
 
 <script>
-  /* -------- Dynamic Rank Badge (circle, number inside) for brand + cards -------- */
-  function createRankBadge(value, { size = 32, mode = 'number', spin = false } = {}) {
-    const v = Math.max(0, Math.min(100, Math.round(value)));
-    const gid = 'g' + Math.random().toString(36).slice(2,7);
-    const navy = '#0B1F3B', gold='#C49A6C', track='#E2E8F0', text='#0F172A';
-    const stroke = Math.max(4, Math.round(size*0.18));
-    const c = size/2, r=(size/2)-(stroke/2)-1;
-    const C = 2*Math.PI*r, target = C*(1 - v/100);
-    const fsz = Math.round(size*0.36); // enough inner whitespace
-    return `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-label="Rank ${v}">
+/* ===== Helpers: store / KPI ===== */
+const AR_NS='agent_ranks';
+function getStore(){try{return JSON.parse(localStorage.getItem(AR_NS)||'{}')}catch(e){return{}}}
+function setStore(o){localStorage.setItem(AR_NS,JSON.stringify(o))}
+const KPI=getStore().kpi||[]; function logEvent(type,data){KPI.push({ts:new Date().toISOString(),type,data});const s=getStore();s.kpi=KPI;setStore(s)}
+function downloadKPI(){const blob=new Blob([JSON.stringify(KPI,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=Object.assign(document.createElement('a'),{href:url,download:'agent_ranks_kpi.json'});a.click();URL.revokeObjectURL(url)}
+
+/* ===== Brand badge (dynamic circle) ===== */
+function createRankBadge(value,{size=32,mode='number',spin=false}={}) {
+  const v=Math.max(0,Math.min(100,Math.round(value))), gid='g'+Math.random().toString(36).slice(2,7);
+  const navy='#0B1F3B', gold='#C49A6C', track='#E2E8F0', text='#0F172A';
+  const stroke=Math.max(4,Math.round(size*0.18)), c=size/2, r=(size/2)-(stroke/2)-1;
+  const C=2*Math.PI*r, target=C*(1-v/100), fsz=Math.round(size*0.36);
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
   <defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="${navy}"/><stop offset="100%" stop-color="${gold}"/></linearGradient></defs>
   <circle cx="${c}" cy="${c}" r="${r}" fill="#fff" stroke="${track}" stroke-width="${stroke}"/>
   <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="url(#${gid})" stroke-width="${stroke}" stroke-linecap="round"
           stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${target.toFixed(2)}"/>
   <text x="${c}" y="${c+Math.round(size*0.06)}" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial"
         font-weight="800" font-size="${fsz}" fill="${text}">${v}</text>
-</svg>`;
-  }
+</svg>`}
+document.getElementById('brand-badge').innerHTML=createRankBadge(98,{size:32,mode:'number',spin:false})
 
-  // Brand badge (logo) +30% at 32px
-  document.getElementById('brand-badge').innerHTML = createRankBadge(98, { size: 32, mode: 'number', spin: false });
+/* ===== Hero rotation with on-image testimonials (3 scenes) ===== */
+const slides=[
+  {el:document.getElementById('slide0'), title:'Accepted over ask', sub:'Bucktown • SFH • 11 days — “We met three great options anonymously and chose the one who sold our place in 11 days.”',
+   src:'https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop'},
+  {el:document.getElementById('slide1'), title:'Keys at the closing table', sub:'Lincoln Park • Condo — “The match understood we were first-time buyers at $800k. Perfect fit.”',
+   src:'https://images.unsplash.com/photo-1560518883-90a2e0b8d29d?q=80&w=1600&auto=format&fit=crop'},
+  {el:document.getElementById('slide2'), title:'SOLD — stress-free', sub:'North Shore — “Zero awkward calls. Just private chat until both sides said yes.”',
+   src:'https://images.unsplash.com/photo-1560184897-a50f6f7d518f?q=80&w=1600&auto=format&fit=crop'}
+];
+const capTitle=document.getElementById('capTitle'), capSub=document.getElementById('capSub');
+let heroIdx=0;
+slides.forEach(s=>s.el.style.backgroundImage=`linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%), url('${s.src}')`);
+setInterval(()=>{ slides[heroIdx].el.classList.remove('active'); heroIdx=(heroIdx+1)%slides.length; slides[heroIdx].el.classList.add('active'); capTitle.textContent=slides[heroIdx].title; capSub.textContent=slides[heroIdx].sub; },3800)
 
-  /* -------- HERO rotation with on-image testimonials -------- */
-  const slides = [
-    {
-      el: document.getElementById('slide0'),
-      title: 'Accepted over ask',
-      sub: 'Bucktown • SFH • 11 days — “We met three great options anonymously and chose the one who sold our place in 11 days.”',
-      // Image: handshake at a nice home (for sale)
-      src: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop"
-    },
-    {
-      el: document.getElementById('slide1'),
-      title: 'Keys at the closing table',
-      sub: 'Lincoln Park • Condo • “The match understood we were first-time buyers at $800k. Perfect fit.”',
-      // Image: keys exchange at closing
-      src: "https://images.unsplash.com/photo-1560518883-90a2e0b8d29d?q=80&w=1600&auto=format&fit=crop"
-    },
-    {
-      el: document.getElementById('slide2'),
-      title: 'SOLD — stress-free',
-      sub: 'North Shore • “Zero awkward calls. Just private chat until both sides said yes.”',
-      // Image: sold sign with agent & seller
-      src: "https://images.unsplash.com/photo-1560184897-a50f6f7d518f?q=80&w=1600&auto=format&fit=crop"
+/* ===== PLID (Protected Lead ID) ===== */
+async function sha256(str){ if(window.crypto?.subtle){const enc=new TextEncoder().encode(str);const buf=await crypto.subtle.digest('SHA-256',enc);return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')} let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0}return 'fb-'+Math.abs(h) }
+async function createPLID(email,phone){ const ts=new Date().toISOString(); const hash=await sha256((email||'')+'|'+(phone||'')+'|'+ts); const store=getStore(); store.plid={id:hash,email,phone,ts}; setStore(store); logEvent('plid_created',store.plid); return store.plid }
+function getPLID(){return(getStore().plid)||null}
+function openClientConsent(){document.getElementById('client-consent-modal').classList.remove('hidden')}
+function closeClientConsent(){document.getElementById('client-consent-modal').classList.add('hidden')}
+document.getElementById('client-consent-close').onclick=closeClientConsent
+document.getElementById('cc-continue').onclick=async()=>{const email=document.getElementById('cc-email').value.trim();const phone=document.getElementById('cc-phone').value.trim();const ok=document.getElementById('cc-consent').checked;const err=document.getElementById('cc-error');if(!email||!phone||!ok){err.style.display='block';return}err.style.display='none';await createPLID(email,phone);closeClientConsent();if(window.__afterClientConsent){const fn=window.__afterClientConsent;window.__afterClientConsent=null;fn()}}
+
+/* ===== Eligible / Shadow pool invite simulator ===== */
+const INVITE_DB={}; function inviteAgent(agentId,ttlMinutes=240){const until=Date.now()+ttlMinutes*60*1000;INVITE_DB[agentId]={expiresAt:until,accepted:false}; setTimeout(()=>{ if(INVITE_DB[agentId]) INVITE_DB[agentId].accepted=true },10000)}
+function inviteStatus(agentId){const e=INVITE_DB[agentId]; if(!e) return {active:false}; return {active:true,accepted:!!e.accepted,remainingMs:Math.max(0,e.expiresAt-Date.now())}}
+
+/* ===== Sample agent data (add eligible flags) ===== */
+let AGENTS=[
+  {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1,eligible:true},
+  {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0,eligible:false},
+  {id:'A3',alias:'First-Time Buyer Guide',neighborhoods:['Lincoln Square','Ravenswood','Avondale','Logan Square'],propertyTypes:['Condo','Townhome'],priceMin:300000,priceMax:800000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:38,resources:['Lender Intros','Buyer Workshops','Offer Playbooks'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.0,eligible:true},
+  {id:'A4',alias:'Luxury Lakefront Team',neighborhoods:['Gold Coast','Streeterville','Old Town'],propertyTypes:['Condo','Single Family'],priceMin:1200000,priceMax:6000000,focus:'Seller',marketing:5,negotiation:4,transactions12m:29,resources:['International Network','Print Features','Private Showings'],brokerageMarketing:5,domVsArea:-6,spLpVsArea:1.6,buyDiscountVsArea:0.0,eligible:false}
+];
+
+/* ===== Scoring ===== */
+const METRICS={neighborhood:{label:'Neighborhood specialization',weight:{Buyer:.22,Seller:.18}},productType:{label:'Product type fit',weight:{Buyer:.12,Seller:.12}},priceBand:{label:'Price band fit',weight:{Buyer:.12,Seller:.12}},roleFocus:{label:'Buyer/Seller focus',weight:{Buyer:.10,Seller:.10}},resources:{label:'Resources to achieve goals',weight:{Buyer:.18,Seller:.22}},brokerage:{label:'Brokerage marketing power',weight:{Buyer:.08,Seller:.12}},trackRecord:{label:'Success & track record',weight:{Buyer:.18,Seller:.14}}};
+const agentMetrics={}; function recordAgentResponse(agentId,ms){agentMetrics[agentId]=agentMetrics[agentId]||{firstResponseMs:[]}; agentMetrics[agentId].firstResponseMs.push(ms)}
+function responsivenessPenalty(agentId){const arr=(agentMetrics[agentId]?.firstResponseMs||[]); if(!arr.length) return 0; const sorted=[...arr].sort((a,b)=>a-b); const med=sorted[Math.floor(sorted.length/2)]; return med>14400000?4:0}
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+function overlapRatio(range,aMin,aMax){const[pMin,pMax]=range||[0,0]; const inter=Math.max(0,Math.min(pMax,aMax)-Math.max(pMin,aMin)); const uni=Math.max(pMax,aMax)-Math.min(pMin,aMin); return uni>0?inter/uni:0}
+function scoreAgent(agent,answers){
+  const role=answers.role||'Buyer';
+  const neighborhood=answers.location?(agent.neighborhoods.some(n=>n.toLowerCase().includes(answers.location.toLowerCase()))?1:0):.5;
+  const productType=answers.propertyType?(agent.propertyTypes.includes(answers.propertyType)?1:0):.5;
+  const priceBand=overlapRatio(answers.priceRange,agent.priceMin,agent.priceMax)||.5;
+  const roleFocus=answers.role?(answers.role===agent.focus?1:0):.5;
+  const m=agent.marketing/5, n=agent.negotiation/5;
+  const wantsM=(answers.priorities||[]).includes('Marketing Power'), wantsN=(answers.priorities||[]).includes('Negotiation Strength');
+  const resources=role==='Seller'?clamp(.7*m+.3*n+(wantsM?.1:0)):clamp(.7*n+.3*m+(wantsN?.1:0));
+  const brokerage=agent.brokerageMarketing/5;
+  const activity=Math.min(agent.transactions12m,50)/50;
+  const domScore=role==='Seller'?clamp(.5+(-agent.domVsArea)/30):.5;
+  const spLpScore=role==='Seller'?clamp((agent.spLpVsArea+3)/6):.5;
+  const buyerDiscount=role==='Buyer'?clamp((agent.buyDiscountVsArea+2)/4):.5;
+  const performance=role==='Seller'?clamp(.6*spLpScore+.4*domScore):buyerDiscount;
+  const trackRecord=clamp(.6*performance+.4*activity);
+  const raw={neighborhood,productType,priceBand,roleFocus,resources,brokerage,trackRecord};
+  const parts=Object.entries(METRICS).map(([k,d])=>{const w=d.weight[role], s=raw[k]??0; return {id:k,label:d.label,weight:w,score:s,points:Math.round(s*w*100)}});
+  const totalBase=parts.reduce((s,p)=>s+p.points,0), penalty=responsivenessPenalty(agent.id||agent.alias)||0, total=Math.max(0,totalBase-penalty);
+  return { total, parts, raw, penalty }
+}
+function narrative(agent,answers){
+  const bullets=[]; if(answers.location){const locs=agent.neighborhoods.filter(n=>n.toLowerCase().includes(answers.location.toLowerCase())).slice(0,2).join(', '); if(locs) bullets.push('Specializes near '+locs+'.')}
+  if(answers.propertyType) bullets.push('Primary focus: '+answers.propertyType+'.');
+  if(answers.priceRange) bullets.push('Comfortable in your price window ($'+Number(answers.priceRange[0]).toLocaleString()+'–$'+Number(answers.priceRange[1]).toLocaleString()+').');
+  if(answers.role) bullets.push((answers.role==='Buyer'?'Buyer':'Seller')+'-oriented strategies.');
+  if((answers.priorities||[]).includes('Marketing Power')) bullets.push('Strong marketing: '+(agent.resources||[]).slice(0,2).join(', ')+'.');
+  if((answers.priorities||[]).includes('Negotiation Strength')) bullets.push('Known for sharp negotiations.');
+  bullets.push(agent.transactions12m+' closings in last 12 months.'); return bullets
+}
+
+/* ===== Questionnaire state + UI wiring ===== */
+const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
+const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
+const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
+const progressBar=document.getElementById('progress-bar'), stepNum=document.getElementById('step-num');
+const PROPERTY_TYPES=['Condo','Single Family','Townhome','Loft','Multi-Unit'];
+const PRIORITIES=['Local Expertise','Marketing Power','Negotiation Strength','New Construction Access','Off-Market Access'];
+let step=0;
+
+(function renderPropertyTypes(){const h=document.getElementById('property-types'); h.innerHTML=''; PROPERTY_TYPES.forEach(pt=>{const b=document.createElement('button'); b.className='choice'; b.textContent=pt; b.onclick=()=>{state.propertyType=pt; h.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected')); b.classList.add('selected')}; h.appendChild(b)})})();
+(function renderPriorities(){const h=document.getElementById('priorities'); h.innerHTML=''; PRIORITIES.forEach(p=>{const b=document.createElement('button'); b.className='choice'; b.textContent=p; b.onclick=()=>{const i=state.priorities.indexOf(p); if(i>=0){state.priorities.splice(i,1); b.classList.remove('selected')} else {state.priorities.push(p); b.classList.add('selected')}}; h.appendChild(b)})})();
+document.querySelectorAll('[data-role]').forEach(b=>{b.onclick=()=>{state.role=b.getAttribute('data-role'); document.querySelectorAll('[data-role]').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); goStep(1)}})
+document.getElementById('input-location').oninput=(e)=>{state.location=e.target.value||''}
+document.getElementById('price-min').oninput=(e)=>{state.priceRange[0]=+e.target.value||0}
+document.getElementById('price-max').oninput=(e)=>{state.priceRange[1]=+e.target.value||0}
+document.querySelectorAll('.timing').forEach(b=>{b.onclick=()=>{state.timing=b.getAttribute('data-val'); document.querySelectorAll('.timing').forEach(x=>x.classList.remove('selected')); b.classList.add('selected')}})
+function goStep(n){step=n; stepEls.forEach((el,i)=>el.classList.toggle('hidden',i!==step)); stepNum.textContent=(step+1); progressBar.style.width=((step+1)/6*100)+'%'; backBtn.disabled=(step===0); nextBtn.classList.toggle('hidden',step===5); finishBtn.classList.toggle('hidden',step!==5)}
+backBtn.onclick=()=>{if(step>0)goStep(step-1)}
+nextBtn.onclick=()=>{if(step<5)goStep(step+1)}
+finishBtn.onclick=()=>{document.getElementById('results').classList.remove('hidden'); renderResults(); location.hash='#results'; logEvent('quiz_complete', state)}
+goStep(0)
+
+/* ===== Results render ===== */
+function renderResults(){
+  const sc=AGENTS.map(a=>({agent:a,score:scoreAgent(a,state),bullets:narrative(a,state)})).sort((x,y)=>y.score.total-x.score.total);
+  const top3=sc.slice(0,3), rest=sc.slice(3,10);
+  const topEl=document.getElementById('top3'); topEl.innerHTML=''; top3.forEach(r=>topEl.appendChild(renderAgentCard(r)));
+  const restEl=document.getElementById('rest'); restEl.innerHTML=''; rest.forEach(r=>restEl.appendChild(renderAgentSmall(r)));
+}
+function renderAgentCard(r){
+  const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='14px';
+  const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
+  head.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;">
+      ${createRankBadge(r.score.total,{size:42,mode:'number'})}
+      <div><div class="xsmall">Top Match</div><div class="h3">${r.agent.alias}</div></div>
+    </div>
+    <div style="text-align:right;"><div style="font-size:24px;font-weight:800;">${r.score.total}</div><div class="xsmall">Fit score</div></div>`;
+  wrap.appendChild(head);
+
+  const ul=document.createElement('ul'); ul.className='list small'; ul.style.marginTop='8px';
+  r.bullets.forEach(b=>{const li=document.createElement('li'); li.textContent=b; ul.appendChild(li)}); wrap.appendChild(ul);
+
+  const pillbar=document.createElement('div'); pillbar.className='pillbar'; pillbar.style.marginTop='8px';
+  r.agent.propertyTypes.forEach(t=>{const s=document.createElement('span'); s.className='chip'; s.textContent=t; pillbar.appendChild(s)});
+  const f=document.createElement('span'); f.className='chip'; f.textContent=r.agent.focus+' focus'; pillbar.appendChild(f);
+  wrap.appendChild(pillbar);
+
+  // Actions: Connect (gated) + Save
+  const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='10px'; actions.style.marginTop='10px';
+  const btnConnect=document.createElement('button'); btnConnect.className='btn'; btnConnect.textContent='Connect';
+  const btnSave=document.createElement('button'); btnSave.className='btn btn-outline'; btnSave.textContent='Save for later';
+  actions.appendChild(btnConnect); actions.appendChild(btnSave); wrap.appendChild(actions);
+
+  const note=document.createElement('div'); note.className='xsmall'; note.style.marginTop='6px'; wrap.appendChild(note);
+  function renderEligibility(){
+    if(r.agent.eligible){ note.textContent='This agent is eligible for immediate introduction.'; }
+    else { const st=inviteStatus(r.agent.id); if(!st.active){ inviteAgent(r.agent.id) } const ns=inviteStatus(r.agent.id);
+      if(ns.accepted){ r.agent.eligible=true; note.textContent='Accepted — agent is now eligible.'; }
+      else { const mins=Math.ceil((ns.remainingMs||0)/60000); note.textContent=`Top candidate pending acceptance (up to ${Math.max(mins,1)} min). We’ll introduce immediately upon acceptance.`; }
     }
-  ];
-  const capTitle = document.getElementById('capTitle');
-  const capSub = document.getElementById('capSub');
-  let heroIdx = 0;
-  setInterval(() => {
-    slides[heroIdx].el.classList.remove('active');
-    heroIdx = (heroIdx + 1) % slides.length;
-    slides[heroIdx].el.style.backgroundImage =
-      `linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%), url('${slides[heroIdx].src}')`;
-    slides[heroIdx].el.classList.add('active');
-    capTitle.textContent = slides[heroIdx].title;
-    capSub.textContent = slides[heroIdx].sub;
-  }, 3800);
+  } renderEligibility();
 
-  /* -------- Matching data (sample) -------- */
-  let AGENTS=[
-    {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1},
-    {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0},
-    {id:'A3',alias:'First-Time Buyer Guide',neighborhoods:['Lincoln Square','Ravenswood','Avondale','Logan Square'],propertyTypes:['Condo','Townhome'],priceMin:300000,priceMax:800000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:38,resources:['Lender Intros','Buyer Workshops','Offer Playbooks'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.0},
-    {id:'A4',alias:'Luxury Lakefront Team',neighborhoods:['Gold Coast','Streeterville','Old Town'],propertyTypes:['Condo','Single Family'],priceMin:1200000,priceMax:6000000,focus:'Seller',marketing:5,negotiation:4,transactions12m:29,resources:['International Network','Print Features','Private Showings'],brokerageMarketing:5,domVsArea:-6,spLpVsArea:1.6,buyDiscountVsArea:0.0}
-  ];
+  btnConnect.onclick=async()=>{ const plid=getPLID(); if(!plid){ window.__afterClientConsent=()=>doConnect(); openClientConsent(); } else { doConnect() } }
+  function doConnect(){ if(r.agent.eligible||inviteStatus(r.agent.id).accepted){ r.agent.eligible=true; logEvent('connect_revealed',{agentId:r.agent.id}); openChat(r.agent) } else { alert('We’ve invited this top candidate to accept the referral (up to 4 hours). In the meantime, consider another match below.'); logEvent('connect_pending',{agentId:r.agent.id}) } }
+  return wrap
+}
+function renderAgentSmall(r){
+  const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='12px';
+  const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between';
+  head.innerHTML=`<div class="small" style="font-weight:700;display:flex;align-items:center;gap:8px;">${createRankBadge(r.score.total,{size:34,mode:'number'})}${r.agent.alias}</div><div class="small" style="font-weight:700;">${r.score.total}</div>`;
+  wrap.appendChild(head);
+  const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style.marginTop='6px';
+  r.bullets.slice(0,3).forEach(b=>{const li=document.createElement('li'); li.textContent=b; ul.appendChild(li)}); wrap.appendChild(ul);
+  const btn=document.createElement('button'); btn.className='btn'; btn.style.width='100%'; btn.style.marginTop='8px'; btn.textContent='Connect';
+  btn.onclick=()=>alert('Use the top matches to connect immediately.'); wrap.appendChild(btn);
+  return wrap
+}
 
-  const METRICS={neighborhood:{label:'Neighborhood specialization',weight:{Buyer:.22,Seller:.18}},productType:{label:'Product type fit',weight:{Buyer:.12,Seller:.12}},priceBand:{label:'Price band fit',weight:{Buyer:.12,Seller:.12}},roleFocus:{label:'Buyer/Seller focus',weight:{Buyer:.10,Seller:.10}},resources:{label:'Resources to achieve goals',weight:{Buyer:.18,Seller:.22}},brokerage:{label:'Brokerage marketing power',weight:{Buyer:.08,Seller:.12}},trackRecord:{label:'Success & track record',weight:{Buyer:.18,Seller:.14}}};
-  const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
-  function overlapRatio(range,aMin,aMax){ const [pMin,pMax]=range||[0,0]; const inter=Math.max(0,Math.min(pMax,aMax)-Math.max(pMin,aMin)); const uni=Math.max(pMax,aMax)-Math.min(pMin,aMin); return uni>0?inter/uni:0 }
+/* ===== Chat (with responsiveness measurement demo) ===== */
+const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatMin=document.getElementById('chat-min'); const chatFab=document.getElementById('chat-fab');
+function openChat(agent){
+  document.getElementById('chat-title').textContent=agent.alias;
+  const msgs=document.getElementById('chat-messages'); msgs.innerHTML='';
+  appendMsg('system',"Anonymous chat created. Share only what you're comfortable with.");
+  let firstClientMsgAt=0, agentReplied=false;
+  const sendBtn=document.getElementById('chat-send'); const input=document.getElementById('chat-input');
+  sendBtn.onclick=()=>{ const t=(input.value||'').trim(); if(!t) return; appendMsg('You',t); if(!firstClientMsgAt) firstClientMsgAt=Date.now(); input.value=''; if(!agentReplied){ const delay=30000+Math.random()*150000; setTimeout(()=>{ appendMsg(agent.alias,'Thanks for reaching out — happy to help.'); agentReplied=true; recordAgentResponse(agent.id||agent.alias, Date.now()-firstClientMsgAt) },delay)} };
+  showModal();
+}
+function appendMsg(who,text){const box=document.createElement('div');box.className='card';box.style.padding='8px 10px';box.style.maxWidth='80%';box.style.margin='6px 0';if(who==='You'){box.style.marginLeft='auto';box.style.background='#111827';box.style.color='#fff'};const w=document.createElement('div');w.className='xsmall';w.textContent=who;const t=document.createElement('div');t.className='small';t.style.marginTop='4px';t.textContent=text;box.appendChild(w);box.appendChild(t);const msgs=document.getElementById('chat-messages');msgs.appendChild(box);msgs.scrollTop=msgs.scrollHeight}
+function showModal(){modal.classList.remove('hidden');modal.setAttribute('aria-hidden','false');document.getElementById('chat-input').focus()}
+function hideModal(){modal.classList.add('hidden');modal.setAttribute('aria-hidden','true')}
+document.getElementById('chat-send').onclick=()=>{} // replaced in openChat
+chatClose.onclick=hideModal; chatMin.onclick=hideModal; modal.addEventListener('click',e=>{if(e.target===modal)hideModal()}); document.addEventListener('keydown',e=>{if(e.key==='Escape')hideModal()})
+chatFab.onclick=()=>{ if(modal.classList.contains('hidden')){ document.getElementById('chat-title').textContent='Agent'; const msgs=document.getElementById('chat-messages'); msgs.innerHTML=''; appendMsg('system',"Anonymous chat created. Share only what you're comfortable with."); showModal() } else { hideModal() } }
 
-  function scoreAgent(agent,answers){
-    const role=answers.role||'Buyer';
-    const neighborhood=answers.location?(agent.neighborhoods.some(n=>n.toLowerCase().includes(answers.location.toLowerCase()))?1:0):.5;
-    const productType=answers.propertyType?(agent.propertyTypes.includes(answers.propertyType)?1:0):.5;
-    const priceBand=overlapRatio(answers.priceRange,agent.priceMin,agent.priceMax)||.5;
-    const roleFocus=answers.role?(answers.role===agent.focus?1:0):.5;
-    const m=agent.marketing/5, n=agent.negotiation/5;
-    const wantsM=(answers.priorities||[]).includes('Marketing Power'), wantsN=(answers.priorities||[]).includes('Negotiation Strength');
-    const resources=role==='Seller'?clamp(.7*m+.3*n+(wantsM? .1:0)):clamp(.7*n+.3*m+(wantsN? .1:0));
-    const brokerage=agent.brokerageMarketing/5;
-    const activity=Math.min(agent.transactions12m,50)/50;
-    const domScore=role==='Seller'?clamp(.5+(-agent.domVsArea)/30):.5;
-    const spLpScore=role==='Seller'?clamp((agent.spLpVsArea+3)/6):.5;
-    const buyerDiscount=role==='Buyer'?clamp((agent.buyDiscountVsArea+2)/4):.5;
-    const performance=role==='Seller'?clamp(.6*spLpScore+.4*domScore):buyerDiscount;
-    const trackRecord=clamp(.6*performance+.4*activity);
-    const raw={neighborhood,productType,priceBand,roleFocus,resources,brokerage,trackRecord};
-    const parts=Object.entries(METRICS).map(([k,d])=>{ const w=d.weight[role], s=raw[k]??0; return {id:k,label:d.label,weight:w,score:s,points:Math.round(s*w*100)} });
-    const total=parts.reduce((s,p)=>s+p.points,0);
-    return { total, parts, raw }
-  }
+/* ===== Deal Intake & Milestones ===== */
+function openDealIntake(){ document.getElementById('deal-intake-modal').classList.remove('hidden') }
+function closeDealIntake(){ document.getElementById('deal-intake-modal').classList.add('hidden') }
+document.getElementById('di-close').onclick=closeDealIntake
+document.querySelectorAll('.ms-btn').forEach(b=> b.onclick=()=>setMilestone(b.getAttribute('data-ms')))
+function saveIntake(){const s=getStore(); s.deal={ts:new Date().toISOString(), side:document.getElementById('di-side').value, type:document.getElementById('di-type').value.trim(), address:document.getElementById('di-address').value.trim(), closeDate:document.getElementById('di-close').value, title:document.getElementById('di-title').value.trim(), notes:document.getElementById('di-notes').value.trim(), milestone:s.deal?.milestone||'offer'}; setStore(s); document.getElementById('di-status').textContent='Saved.'; logEvent('deal_intake_saved',s.deal)}
+document.getElementById('di-save').onclick=saveIntake
+function setMilestone(ms){const s=getStore(); s.deal=s.deal||{}; s.deal.milestone=ms; setStore(s); document.getElementById('di-status').textContent='Milestone: '+ms; logEvent('deal_milestone',{ms})}
+document.getElementById('di-generate-dtp').onclick=()=>{const s=getStore(), d=s.deal||{}, pl=s.plid||{}; const w=window.open('','_blank','width=800,height=900'); w.document.write(`<html><head><title>Direction to Pay — Agent Ranks</title></head><body style="font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial"><h2>Direction to Pay</h2><p>Date: ${new Date().toLocaleDateString()}</p><p><strong>Transaction:</strong> ${d.address||'(TBD)'} — ${d.side||''} — Expected close: ${d.closeDate||'(TBD)'}.</p><p><strong>Please remit</strong> the referral fee of <strong>25% of agent-side GCI</strong> to Agent Ranks at closing.</p><p><strong>Client (Protected Lead):</strong> ${(pl.email||'')+' / '+(pl.phone||'')}</p><p><strong>Title/Attorney:</strong> ${d.title||'(TBD)'}.</p><p><strong>Agent acknowledges</strong> the Program Participation Agreement and requests disbursement on the settlement statement.</p><hr><p>Agent Ranks • support@agentranks.com • (xxx) xxx-xxxx</p></body></html>`); w.document.close(); w.focus()}
 
-  function narrative(agent,answers){
-    const bullets=[];
-    if(answers.location){
-      const locs=agent.neighborhoods.filter(n=>n.toLowerCase().includes(answers.location.toLowerCase())).slice(0,2).join(', ');
-      if(locs) bullets.push('Specializes near '+locs+'.');
-    }
-    if(answers.propertyType) bullets.push('Primary focus: '+answers.propertyType+'.');
-    if(answers.priceRange) bullets.push('Comfortable in your price window ($'+Number(answers.priceRange[0]).toLocaleString()+'–$'+Number(answers.priceRange[1]).toLocaleString()+').');
-    if(answers.role) bullets.push((answers.role==='Buyer'?'Buyer':'Seller')+'-oriented strategies.');
-    if((answers.priorities||[]).includes('Marketing Power')) bullets.push('Strong marketing: '+(agent.resources||[]).slice(0,2).join(', ')+'.');
-    if((answers.priorities||[]).includes('Negotiation Strength')) bullets.push('Known for sharp negotiations.');
-    bullets.push(agent.transactions12m+' closings in last 12 months.');
-    return bullets
-  }
-
-  /* -------- Questionnaire state + fixed interactions -------- */
-  const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
-  const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
-  const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
-  const progressBar=document.getElementById('progress-bar'), stepNum=document.getElementById('step-num');
-  const PROPERTY_TYPES=['Condo','Single Family','Townhome','Loft','Multi-Unit'];
-  const PRIORITIES=['Local Expertise','Marketing Power','Negotiation Strength','New Construction Access','Off-Market Access'];
-  let step=0;
-
-  // Render property types with working selection
-  (function renderPropertyTypeButtons(){
-    const holder=document.getElementById('property-types'); holder.innerHTML='';
-    PROPERTY_TYPES.forEach(pt=>{
-      const btn=document.createElement('button');
-      btn.className='choice'; btn.textContent=pt;
-      btn.onclick=()=>{ state.propertyType=pt; // toggle selected feel (single-select)
-        holder.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));
-        btn.classList.add('selected');
-      };
-      holder.appendChild(btn);
-    });
-  })();
-
-  // Render priorities (multi-select)
-  (function renderPriorityCheckboxes(){
-    const holder=document.getElementById('priorities'); holder.innerHTML='';
-    PRIORITIES.forEach(p=>{
-      const btn=document.createElement('button');
-      btn.className='choice'; btn.innerHTML='<span>'+p+'</span>';
-      btn.onclick=()=>{
-        const i=state.priorities.indexOf(p);
-        if(i>=0){ state.priorities.splice(i,1); btn.classList.remove('selected'); }
-        else { state.priorities.push(p); btn.classList.add('selected'); }
-      };
-      holder.appendChild(btn);
-    });
-  })();
-
-  // Role selection
-  document.querySelectorAll('[data-role]').forEach(btn=>{
-    btn.onclick=()=>{ state.role=btn.getAttribute('data-role');
-      document.querySelectorAll('[data-role]').forEach(b=>b.classList.remove('selected'));
-      btn.classList.add('selected'); goStep(1);
-    };
-  });
-
-  // Location & price inputs
-  document.getElementById('input-location').oninput=(e)=>{ state.location=e.target.value||'' };
-  document.getElementById('price-min').oninput=(e)=>{ state.priceRange[0]=+e.target.value||0 };
-  document.getElementById('price-max').oninput=(e)=>{ state.priceRange[1]=+e.target.value||0 };
-
-  // Timing buttons — fixed: selected state + value
-  document.querySelectorAll('.timing').forEach(btn=>{
-    btn.onclick=()=>{ state.timing=btn.getAttribute('data-val');
-      document.querySelectorAll('.timing').forEach(b=>b.classList.remove('selected'));
-      btn.classList.add('selected');
-    };
-  });
-
-  function goStep(n){
-    step=n;
-    stepEls.forEach((el,i)=>el.classList.toggle('hidden', i!==step));
-    stepNum.textContent=(step+1);
-    progressBar.style.width=((step+1)/6*100)+'%';
-    backBtn.disabled=(step===0);
-    nextBtn.classList.toggle('hidden', step===5);
-    finishBtn.classList.toggle('hidden', step!==5);
-  }
-  backBtn.onclick=()=>{ if(step>0) goStep(step-1) };
-  nextBtn.onclick=()=>{ if(step<5) goStep(step+1) };
-  finishBtn.onclick=()=>{ document.getElementById('results').classList.remove('hidden'); renderResults(); location.hash='#results' };
-  goStep(0);
-
-  /* -------- Results render (with badge 42px on main cards, 34px on small) -------- */
-  function renderResults(){
-    const sc=AGENTS.map(a=>({agent:a,score:scoreAgent(a,state),bullets:narrative(a,state)})).sort((x,y)=>y.score.total-x.score.total);
-    const top3=sc.slice(0,3), rest=sc.slice(3,10);
-    const topEl=document.getElementById('top3'); topEl.innerHTML='';
-    const restEl=document.getElementById('rest'); restEl.innerHTML='';
-
-    top3.forEach(r=> topEl.appendChild(renderAgentCard(r)));
-    rest.forEach(r=> restEl.appendChild(renderAgentSmall(r)));
-  }
-  function renderAgentCard(r){
-    const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='14px';
-    const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
-    head.innerHTML=`
-      <div style="display:flex;align-items:center;gap:10px;">
-        ${createRankBadge(r.score.total, { size: 42, mode: 'number' })}
-        <div>
-          <div class="xsmall">Top Match</div>
-          <div class="h3">${r.agent.alias}</div>
-        </div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:24px; font-weight:800;">${r.score.total}</div>
-        <div class="xsmall">Fit score</div>
-      </div>`;
-    wrap.appendChild(head);
-
-    const ul=document.createElement('ul'); ul.className='list small'; ul.style.marginTop='8px';
-    r.bullets.forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
-    wrap.appendChild(ul);
-
-    const pillbar=document.createElement('div'); pillbar.className='pillbar'; pillbar.style.marginTop='8px';
-    r.agent.propertyTypes.forEach(t=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=t; pillbar.appendChild(s) });
-    const f=document.createElement('span'); f.className='chip'; f.textContent=r.agent.focus+' focus'; pillbar.appendChild(f);
-    wrap.appendChild(pillbar);
-
-    const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='10px'; actions.style.marginTop='10px';
-    const btnChat=document.createElement('button'); btnChat.className='btn'; btnChat.textContent='Open anonymous chat';
-    const btnSave=document.createElement('button'); btnSave.className='btn btn-outline'; btnSave.textContent='Save for later';
-    actions.appendChild(btnChat); actions.appendChild(btnSave); wrap.appendChild(actions);
-    const note=document.createElement('div'); note.className='xsmall'; note.style.marginTop='6px'; note.textContent='No names or contact details shown. If both sides opt-in, we’ll connect you directly.'; wrap.appendChild(note);
-    btnChat.onclick=()=> openChat(r.agent);
-    return wrap;
-  }
-  function renderAgentSmall(r){
-    const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='12px';
-    const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between';
-    head.innerHTML=`
-      <div class="small" style="font-weight:700; display:flex; align-items:center; gap:8px;">
-        ${createRankBadge(r.score.total, { size: 34, mode: 'number' })}
-        ${r.agent.alias}
-      </div>
-      <div class="small" style="font-weight:700;">${r.score.total}</div>`;
-    wrap.appendChild(head);
-    const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style.marginTop='6px';
-    r.bullets.slice(0,3).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
-    const btn=document.createElement('button'); btn.className='btn'; btn.style.width='100%'; btn.style.marginTop='8px'; btn.textContent='Chat anonymously'; btn.onclick=()=> openChat(r.agent);
-    wrap.appendChild(ul); wrap.appendChild(btn);
-    return wrap;
-  }
-
-  /* -------- Chat controls -------- */
-  const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatMin=document.getElementById('chat-min'); const chatFab=document.getElementById('chat-fab');
-  function openChat(agent){
-    document.getElementById('chat-title').textContent=agent.alias;
-    const msgs=document.getElementById('chat-messages'); msgs.innerHTML='';
-    const seed=[{who:'system',text:"Anonymous chat created. Share only what you're comfortable with."},{who:agent.alias,text:`Hi! I can advise on ${(state.propertyType||'your goals').toLowerCase()} in ${state.location || 'your area'}.`}];
-    seed.forEach(m=>appendMsg(m.who,m.text)); showModal();
-  }
-  function showModal(){ modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false'); document.getElementById('chat-input').focus() }
-  function hideModal(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true') }
-  function appendMsg(who,text){
-    const box=document.createElement('div');
-    box.className='card'; box.style.padding='8px 10px'; box.style.maxWidth='80%'; box.style.margin='6px 0';
-    if(who==='You'){ box.style.marginLeft='auto'; box.style.background='#111827'; box.style.color='#fff' }
-    const whoEl=document.createElement('div'); whoEl.className='xsmall'; whoEl.textContent=who;
-    const textEl=document.createElement('div'); textEl.className='small'; textEl.style.marginTop='4px'; textEl.textContent=text;
-    box.appendChild(whoEl); box.appendChild(textEl);
-    const msgs=document.getElementById('chat-messages'); msgs.appendChild(box); msgs.scrollTop=msgs.scrollHeight;
-  }
-  document.getElementById('chat-send').onclick=()=>{ const inp=document.getElementById('chat-input'); const t=(inp.value||'').trim(); if(!t) return; appendMsg('You',t); inp.value='' };
-  chatClose.onclick=hideModal; chatMin.onclick=hideModal; modal.addEventListener('click',e=>{ if(e.target===modal) hideModal() }); document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideModal() });
-  chatFab.onclick=()=>{ if(modal.classList.contains('hidden')){ document.getElementById('chat-title').textContent='Agent'; const msgs=document.getElementById('chat-messages'); msgs.innerHTML=''; appendMsg('system',"Anonymous chat created. Share only what you're comfortable with."); showModal() } else { hideModal() } };
-
-  /* -------- CSV pilot -------- */
-  document.getElementById('load-sample').onclick=()=>{ const sample=`id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
+/* ===== CSV Pilot ===== */
+document.getElementById('load-sample').onclick=()=>{const sample=`id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
 X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
 X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
-X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0`; document.getElementById('csv').value=sample; document.getElementById('status').textContent='Loaded sample. You can modify before importing.' };
-  document.getElementById('import').onclick=()=>{ try{ const txt=document.getElementById('csv').value||''; const lines=txt.trim().split(/\r?\n/); if(lines.length<2){ document.getElementById('status').textContent='No rows detected. Check your CSV.'; return } const headers=lines[0].split(',').map(h=>h.trim()); const rows=[]; for(let i=1;i<lines.length;i++){ if(!lines[i].trim()) continue; const cols=lines[i].split(',').map(c=>c.trim()); const obj={}; headers.forEach((h,idx)=>obj[h]=cols[idx]??''); const toList=v=>v?v.split(/;|\|/).map(x=>x.trim()).filter(Boolean):[]; rows.push({ id:obj.id||'R'+i, alias:obj.alias||('Agent '+i), neighborhoods:toList(obj.neighborhoods), propertyTypes:toList(obj.propertyTypes), priceMin:parseFloat(obj.priceMin||0), priceMax:parseFloat(obj.priceMax||0), focus:(obj.focus||'Seller').trim(), marketing:parseInt(obj.marketing||3), negotiation:parseInt(obj.negotiation||3), transactions12m:parseInt(obj.transactions12m||0), resources:toList(obj.resources), brokerageMarketing:parseInt(obj.brokerageMarketing||3), domVsArea:parseFloat(obj.domVsArea||0), spLpVsArea:parseFloat(obj.spLpVsArea||0), buyDiscountVsArea:parseFloat(obj.buyDiscountVsArea||0) }) } AGENTS=rows; document.getElementById('status').textContent='Imported '+rows.length+' agents. Matches now use your data.'; document.getElementById('results').classList.remove('hidden'); renderResults(); location.hash='#results' } catch(e){ document.getElementById('status').textContent='Import error. Please check formatting.' } };
+X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0`; document.getElementById('csv').value=sample; document.getElementById('status').textContent='Loaded sample. You can modify before importing.'}
+document.getElementById('import').onclick=()=>{try{const txt=document.getElementById('csv').value||'';const lines=txt.trim().split(/\r?\n/);if(lines.length<2){document.getElementById('status').textContent='No rows detected. Check your CSV.';return}const headers=lines[0].split(',').map(h=>h.trim());const rows=[];for(let i=1;i<lines.length;i++){if(!lines[i].trim())continue;const cols=lines[i].split(',').map(c=>c.trim());const obj={};headers.forEach((h,idx)=>obj[h]=cols[idx]??'');const toList=v=>v?v.split(/;|\|/).map(x=>x.trim()).filter(Boolean):[];rows.push({id:obj.id||'R'+i,alias:obj.alias||('Agent '+i),neighborhoods:toList(obj.neighborhoods),propertyTypes:toList(obj.propertyTypes),priceMin:parseFloat(obj.priceMin||0),priceMax:parseFloat(obj.priceMax||0),focus:(obj.focus||'Seller').trim(),marketing:parseInt(obj.marketing||3),negotiation:parseInt(obj.negotiation||3),transactions12m:parseInt(obj.transactions12m||0),resources:toList(obj.resources),brokerageMarketing:parseInt(obj.brokerageMarketing||3),domVsArea:parseFloat(obj.domVsArea||0),spLpVsArea:parseFloat(obj.spLpVsArea||0),buyDiscountVsArea:parseFloat(obj.buyDiscountVsArea||0),eligible:true})} AGENTS=rows; document.getElementById('status').textContent='Imported '+rows.length+' agents. Matches now use your data.'; document.getElementById('results').classList.remove('hidden'); renderResults(); location.hash='#results'; logEvent('csv_import',{count:rows.length}) }catch(e){document.getElementById('status').textContent='Import error. Please check formatting.'}}
 
-  document.getElementById('year').textContent=new Date().getFullYear();
+/* ===== Init ===== */
+document.getElementById('year').textContent=new Date().getFullYear();
 </script>
-</body>
-</html>
-!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agent Ranks — Confidential Agent Matching (with Dynamic Rank Badge)</title>
-  <style>
-    :root { --bg:#fff; --fg:#0f172a; --muted:#475569; --border:#e2e8f0; --accent:#111827; --soft:#f8fafc; --shadow:0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.06); --radius:14px; }
-    *{ box-sizing:border-box } html,body{ height:100%; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji" }
-    a{ color:var(--accent); text-decoration:none } a:hover{ text-decoration:underline }
-    .container{ max-width:1100px; margin:0 auto; padding:0 16px } .btn{ background:var(--accent); color:#fff; border:0; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer }
-    .btn[disabled]{ opacity:.5; cursor:not-allowed } .btn-outline{ background:#fff; color:var(--fg); border:1px solid var(--border) } .chip{ display:inline-block; background:#eef2ff; color:#1f2937; padding:6px 10px; border-radius:999px; font-size:12px }
-    .card{ background:#fff; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow) } .section{ padding:64px 0 }
-    .h1{ font-size:40px; line-height:1.1; font-weight:800; letter-spacing:-.02em } .h2{ font-size:28px; font-weight:800; letter-spacing:-.02em } .h3{ font-size:16px; font-weight:800 }
-    .muted{ color:var(--muted) } .row{ display:grid; grid-template-columns:1fr; gap:16px } @media(min-width:700px){ .row-2{ grid-template-columns:repeat(2,1fr) } .row-3{ grid-template-columns:repeat(3,1fr) } }
-    header{ position:sticky; top:0; background:rgba(255,255,255,.8); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); z-index:50 } nav a{ margin-right:16px; font-size:14px; color:#111827 }
-    .hero{ position:relative; overflow:hidden } .pill{ display:inline-flex; padding:6px 12px; border-radius:999px; border:1px solid rgba(17,24,39,.15); background:rgba(17,24,39,.03); font-size:12px; font-weight:700 }
-    .hero-visual{ height:320px; border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; position:relative } .slide{ position:absolute; inset:0; display:flex; justify-content:space-between; align-items:flex-end; padding:24px; color:#fff; transition:opacity .6s }
-    .badge{ display:inline-flex; transform:rotate(-6deg); border:2px solid rgba(255,255,255,.7); background:rgba(255,255,255,.15); padding:6px 10px; border-radius:12px; font-weight:900; letter-spacing:.18em; font-size:11px }
-    .shadow{ box-shadow:var(--shadow) } .progress{ height:8px; width:180px; background:#f1f5f9; border-radius:999px; overflow:hidden } .progress>div{ height:100%; background:#111827 }
-    .input,.textarea{ width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px } .grid-2{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-2{ grid-template-columns:repeat(2,1fr) } }
-    .grid-3{ display:grid; grid-template-columns:1fr; gap:12px } @media(min-width:700px){ .grid-3{ grid-template-columns:repeat(3,1fr) } } .list{ list-style:disc; padding-left:18px } .small{ font-size:12px } .xsmall{ font-size:11px; color:#64748b }
-    .pillbar{ display:flex; gap:8px; flex-wrap:wrap } .hidden{ display:none } .modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100 }
-    .tabular{ font-variant-numeric:tabular-nums } .footer{ border-top:1px solid var(--border); background:#fff } #chat-fab{ position:fixed; right:18px; bottom:18px; z-index:60 }
-    /* Critical: ensure modal can be hidden (wins over .modal display:flex) */
-    .modal.hidden, .hidden, #chat-modal[aria-hidden="true"] { display: none !important; }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <!-- Small static badge as logo (no spin) -->
-        <span id="brand-badge" aria-hidden="true"></span>
-        <strong>Agent Ranks</strong>
-      </div>
-      <nav class="hide-mobile">
-        <a href="#how">How it works</a><a href="#questionnaire">Get matched</a><a href="#mortgage">Mortgage & Insurance</a><a href="#admin">Data (pilot)</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
-      </nav>
-      <a href="#questionnaire" class="btn">Find my best match</a>
-    </div>
-  </header>
-
-  <main>
-    <section class="section hero">
-      <div class="container row row-2">
-        <div>
-          <span class="pill">Agent Ranks • Confidential • Unbiased</span>
-          <h1 class="h1" style="margin-top:12px;">Find your best-fit real estate agent — privately</h1>
-          <p class="muted" style="margin-top:8px; max-width: 600px;">50+ matching signals (neighborhood, product type, price band, buyer/seller focus, marketing power, track record). We present your best 3 matches — with no names or contact shared until <em>both</em> sides opt-in.</p>
-          <div style="display:flex; gap:10px; margin-top:16px;">
-            <a class="btn" href="#questionnaire">Start 2-minute match</a><a class="btn btn-outline" href="#how">How it works</a>
-          </div>
-          <div class="card" style="margin-top:16px; padding:12px 14px; background:#111827; color:#fff;">
-            <div id="testi-quote" style="font-size:14px;">“We met three great options anonymously and chose the one who sold our place in 11 days.”</div>
-            <div id="testi-who" class="xsmall" style="color:#cbd5e1; margin-top:4px;">— Seller in West Loop</div>
-          </div>
-        </div>
-        <div>
-          <div class="hero-visual shadow">
-            <div class="slide" id="slide0" style="opacity:1; background: radial-gradient(800px 600px at 20% 20%, rgba(255,255,255,.25), transparent), linear-gradient(135deg, #1e3a8a, #7c3aed, #be185d);">
-              <div><div class="badge">SOLD</div><div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Accepted over ask</div><div class="small" style="opacity:.9;">Bucktown • SFH • 11 days</div></div>
-              <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; font-size:11px;">
-                <div class="chip" style="background: rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.35);">Anonymous chat ready</div>
-                <div class="chip" style="background: rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.35);">No contact shared</div>
-                <div class="chip" style="background: rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.35);">Mutual opt-in</div>
-              </div>
-            </div>
-            <div class="slide" id="slide1" style="opacity:0; background: radial-gradient(800px 600px at 80% 0%, rgba(255,255,255,.2), transparent), linear-gradient(135deg, #0ea5e9, #6366f1, #db2777);">
-              <div><div class="badge">UNDER CONTRACT</div><div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Won first offer</div><div class="small" style="opacity:.9;">Lincoln Park • Condo • $800k</div></div>
-            </div>
-            <div class="slide" id="slide2" style="opacity:0; background: radial-gradient(800px 600px at 0% 100%, rgba(255,255,255,.2), transparent), linear-gradient(135deg, #2563eb, #9333ea, #e11d48);">
-              <div><div class="badge">PRIVATE</div><div style="font-size:18px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:8px;">Off-market preview</div><div class="small" style="opacity:.9;">North Shore • Private showing</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="how" class="section">
-      <div class="container">
-        <h2 class="h2">How it works</h2>
-        <p class="muted" style="margin-top:6px;">Unbiased, data-driven matches. Comfortable, private introductions.</p>
-        <div class="row row-3" style="margin-top:16px;">
-          <div class="card" style="padding:18px;"><div class="chip">1</div><div class="h3" style="margin-top:8px;">Tell us your goals</div><div class="small muted">Buyer or seller, neighborhood, property type, price band, timing, and key priorities.</div></div>
-          <div class="card" style="padding:18px;"><div class="chip">2</div><div class="h3" style="margin-top:8px;">AI-assisted matching</div><div class="small muted">We weigh 50+ signals to rank agents most likely to achieve your outcome.</div></div>
-          <div class="card" style="padding:18px;"><div class="chip">3</div><div class="h3" style="margin-top:8px;">Anonymous introductions</div><div class="small muted">Review short narratives for your top matches without exposing identity or contact info.</div></div>
-          <div class="card" style="padding:18px;"><div class="chip">4</div><div class="h3" style="margin-top:8px;">Mutual opt-in & connect</div><div class="small muted">If you approve, we open a private chat. When both sides agree, we connect directly.</div></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="questionnaire" class="section">
-      <div class="container">
-        <h2 class="h2">Get matched in under 2 minutes</h2>
-        <p class="muted">We only share anonymized needs until you choose to connect.</p>
-        <div class="card" style="margin-top:14px; padding:16px;">
-          <div style="display:flex; align-items:center; justify-content:space-between;">
-            <div class="xsmall">Step <span id="step-num">1</span> of 6</div><div class="progress"><div id="progress-bar" style="width:16.66%"></div></div>
-          </div>
-          <div id="step-0" style="margin-top:12px;">
-            <div class="h3">Are you buying or selling?</div>
-            <div class="grid-2" style="margin-top:10px;">
-              <button class="card" data-role="Buyer" style="padding:12px; text-align:left;"><div class="h3">Buyer</div><div class="small muted">We’ll prioritize negotiation and availability.</div></button>
-              <button class="card" data-role="Seller" style="padding:12px; text-align:left;"><div class="h3">Seller</div><div class="small muted">We’ll prioritize marketing power and days-on-market.</div></button>
-            </div>
-          </div>
-          <div id="step-1" class="hidden" style="margin-top:12px;">
-            <div class="h3">What neighborhood or area?</div>
-            <input id="input-location" class="input" placeholder="e.g., West Loop, Lincoln Park, Hinsdale"><div class="xsmall" style="margin-top:6px;">Tip: You can be specific (e.g., “Bucktown”) or broader (e.g., “North Shore”).</div>
-          </div>
-          <div id="step-2" class="hidden" style="margin-top:12px;">
-            <div class="h3">Property type</div><div class="grid-3" style="margin-top:10px;"><div id="property-types"></div></div>
-          </div>
-          <div id="step-3" class="hidden" style="margin-top:12px;">
-            <div class="h3">Price range</div>
-            <div class="grid-2" style="margin-top:10px;"><div><div class="xsmall">Min</div><input id="price-min" type="number" class="input" value="400000"></div><div><div class="xsmall">Max</div><input id="price-max" type="number" class="input" value="1000000"></div></div>
-            <div class="xsmall" style="margin-top:6px;">Change later if you’re uncertain.</div>
-          </div>
-          <div id="step-4" class="hidden" style="margin-top:12px;"><div class="h3">What matters most?</div><div id="priorities" class="grid-2" style="margin-top:10px;"></div></div>
-          <div id="step-5" class="hidden" style="margin-top:12px;">
-            <div class="h3">Timing</div><div class="grid-3" style="margin-top:10px;">
-              <button class="card timing" data-val="0-3 months" style="padding:12px; text-align:left;">0-3 months</button>
-              <button class="card timing" data-val="3-6 months" style="padding:12px; text-align:left;">3-6 months</button>
-              <button class="card timing" data-val="6-12 months" style="padding:12px; text-align:left;">6-12 months</button>
-            </div>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
-            <button class="btn btn-outline" id="btn-back">Back</button><button class="btn" id="btn-next">Next</button><button class="btn hidden" id="btn-finish">See my matches</button>
-          </div>
-          <div class="xsmall" style="margin-top:8px;">Your details remain private. We only open a chat if you approve your matches and the agent agrees.</div>
-        </div>
-      </div>
-    </section>
-
-    <section id="results" class="section hidden">
-      <div class="container">
-        <h2 class="h2">Your best-fit matches</h2>
-        <p class="muted">We highlight the top three based on your goals. You can still browse up to ten options.</p>
-        <div id="top3" class="row row-3" style="margin-top:16px;"></div>
-        <div style="margin-top:28px;"><div class="h3">Other relevant options</div><div id="rest" class="row row-3" style="margin-top:12px;"></div></div>
-        <div class="card" style="margin-top:28px; padding:16px; background:#f8fafc;">
-          <div class="h3">Mortgage & Insurance (optional)</div>
-          <div class="small muted" style="margin-top:6px;">Prefer a lender or insurance broker style? We’ll factor that into your matches too.</div>
-          <div class="row row-3" style="margin-top:12px;">
-            <label class="small"><input type="checkbox"> I want a rate-shopper lender</label>
-            <label class="small"><input type="checkbox"> I prefer concierge service</label>
-            <label class="small"><input type="checkbox"> I need jumbo loan expertise</label>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="mortgage" class="section">
-      <div class="container">
-        <h2 class="h2">Mortgage & Insurance referrals</h2>
-        <p class="muted">When you're ready, we can introduce you to vetted lenders and brokers based on your profile.</p>
-        <div class="row row-3" style="margin-top:12px;">
-          <div class="card" style="padding:16px;"><div class="h3">Rate-first lenders</div><div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div><button class="btn" style="margin-top:10px;">Add to my matches</button></div>
-          <div class="card" style="padding:16px;"><div class="h3">Concierge lenders</div><div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div><button class="btn" style="margin-top:10px;">Add to my matches</button></div>
-          <div class="card" style="padding:16px;"><div class="h3">Insurance brokers</div><div class="small muted">We’ll factor your preference into matching and keep your info private until you opt-in.</div><button class="btn" style="margin-top:10px;">Add to my matches</button></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="admin" class="section">
-      <div class="container">
-        <h2 class="h2">Pilot data (CSV import) — Chicagoland</h2>
-        <p class="muted">Paste a simple CSV to test with real-looking agent stats before MLS integration.</p>
-        <div class="card" style="padding:16px; margin-top:12px;">
-          <div class="small">Columns: <code>id, alias, neighborhoods (;), propertyTypes (;), priceMin, priceMax, focus, marketing, negotiation, transactions12m, resources (;), brokerageMarketing, domVsArea, spLpVsArea, buyDiscountVsArea</code></div>
-          <textarea id="csv" class="textarea" rows="8" style="margin-top:10px;" placeholder="id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
-X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
-X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
-X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0"></textarea>
-          <div style="display:flex; gap:10px; align-items:center; margin-top:10px;"><button id="load-sample" class="btn btn-outline">Load sample</button><button id="import" class="btn">Import CSV</button><span id="status" class="xsmall"></span></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0;">
-      <div class="xsmall">© <span id="year"></span> Agent Ranks — Demo Concept</div>
-      <div class="xsmall"><a href="#how">How it works</a> · <a href="#faq">FAQ</a> · <a href="#contact">Contact</a></div>
-    </div>
-  </footer>
-
-  <button id="chat-fab" class="btn" title="Open chat">Chat</button>
-
-  <div id="chat-modal" class="modal hidden" aria-hidden="true">
-    <div class="card" role="dialog" aria-modal="true" style="width: min(720px, 100%); max-height: 80vh; display:flex; flex-direction:column;">
-      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border);">
-        <div><div class="xsmall">Anonymous chat</div><div class="h3" id="chat-title">Agent</div></div>
-        <div style="display:flex; gap:8px;"><button class="btn btn-outline" id="chat-min">Minimize</button><button class="btn btn-outline" id="chat-close">Close</button></div>
-      </div>
-      <div id="chat-messages" style="padding:12px; overflow:auto; height: 50vh;"></div>
-      <div style="display:flex; gap:8px; padding:12px; border-top:1px solid var(--border);">
-        <input id="chat-input" class="input" placeholder="Type a message…"><button class="btn" id="chat-send">Send</button>
-      </div>
-      <div class="xsmall" style="padding:10px 12px; border-top:1px solid var(--border);">By continuing, you agree to stay anonymous until both sides opt-in. If an agent accepts, they agree to a 25% referral fee via our standard agreement.</div>
-    </div>
-  </div>
-
-  <script>
-    /* Testimonials + slides */
-    const TESTIMONIALS=[{quote:"We met three great options anonymously and chose the one who sold our place in 11 days.",who:"Seller in West Loop"},{quote:"The match understood we were first-time buyers in Lincoln Park at $800k. Perfect fit.",who:"Buyer in Lincoln Park"},{quote:"Zero awkward phone calls. Just a private chat until both sides said yes.",who:"Seller in Bucktown"}];
-    let testiIdx=0; setInterval(()=>{ testiIdx=(testiIdx+1)%TESTIMONIALS.length; document.getElementById('testi-quote').textContent='“'+TESTIMONIALS[testiIdx].quote+'”'; document.getElementById('testi-who').textContent='— '+TESTIMONIALS[testiIdx].who; },4000);
-    let slideIdx=0; setInterval(()=>{ const ids=['slide0','slide1','slide2']; slideIdx=(slideIdx+1)%ids.length; ids.forEach((id,i)=>{ const el=document.getElementById(id); el.style.opacity=(i===slideIdx?1:0); }); },3500);
-
-    /* -------- Dynamic Rank Badge (circle, number inside) -------- */
-    function createRankBadge(value, { size = 56, shape = 'circle', mode = 'number', spin = true } = {}) {
-      const v = Math.max(0, Math.min(100, Math.round(value)));
-      const label = (mode === 'grade') ? scoreToGrade(v) : String(v);
-      const gid = 'grad' + Math.random().toString(36).slice(2, 8);
-      const navy = '#0B1F3B', gold = '#C49A6C', track = '#E2E8F0', text = '#0F172A';
-      const c = size / 2, stroke = Math.max(4, Math.round(size * 0.12));
-      const spinClass = spin ? 'spin' : '';
-      const fontSize = Math.round(size*0.36);
-      const r = (size / 2) - (stroke / 2) - 2;
-      const circumference = 2 * Math.PI * r;
-      const target = circumference * (1 - v / 100);
-      return `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Rank ${v}">
-  <defs>
-    <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="${navy}"/><stop offset="100%" stop-color="${gold}"/>
-    </linearGradient>
-  </defs>
-  <style>
-    .spin { animation: spin 14s linear infinite }
-    .pulse { animation: pulse 2800ms ease-in-out infinite }
-    @keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
-    @keyframes pulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.03) } }
-  </style>
-  <circle cx="${c}" cy="${c}" r="${r}" fill="#fff" stroke="${track}" stroke-width="${stroke}" />
-  <g class="${spinClass}" style="transform-origin:${c}px ${c}px">
-    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="url(#${gid})" stroke-width="${stroke}"
-            stroke-linecap="round" stroke-dasharray="${circumference.toFixed(2)}"
-            stroke-dashoffset="${circumference.toFixed(2)}">
-      <animate attributeName="stroke-dashoffset" from="${circumference.toFixed(2)}" to="${target.toFixed(2)}"
-               dur="0.9s" fill="freeze" begin="0.05s"/>
-    </circle>
-  </g>
-  <text x="${c}" y="${c + Math.round(size*0.06)}" text-anchor="middle"
-        font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial"
-        font-weight="800" font-size="${fontSize}" fill="${text}" class="pulse">${label}</text>
-</svg>`;
-    }
-    function scoreToGrade(v){ if(v>=97)return'A+'; if(v>=93)return'A'; if(v>=90)return'A-'; if(v>=87)return'B+'; if(v>=83)return'B'; if(v>=80)return'B-'; if(v>=77)return'C+'; if(v>=73)return'C'; if(v>=70)return'C-'; return'—' }
-
-    // Small static brand badge in header (no spin)
-    document.getElementById('brand-badge').innerHTML = createRankBadge(98, { size: 24, shape: 'circle', mode: 'number', spin: false });
-
-    /* ------- Matching data & scoring (unchanged) ------- */
-    let AGENTS=[
-      {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1},
-      {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0},
-      {id:'A3',alias:'First-Time Buyer Guide',neighborhoods:['Lincoln Square','Ravenswood','Avondale','Logan Square'],propertyTypes:['Condo','Townhome'],priceMin:300000,priceMax:800000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:38,resources:['Lender Intros','Buyer Workshops','Offer Playbooks'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.0},
-      {id:'A4',alias:'Luxury Lakefront Team',neighborhoods:['Gold Coast','Streeterville','Old Town'],propertyTypes:['Condo','Single Family'],priceMin:1200000,priceMax:6000000,focus:'Seller',marketing:5,negotiation:4,transactions12m:29,resources:['International Network','Print Features','Private Showings'],brokerageMarketing:5,domVsArea:-6,spLpVsArea:1.6,buyDiscountVsArea:0.0},
-      {id:'A5',alias:'Northwest Bungalow Expert',neighborhoods:['Irving Park','Portage Park','Jefferson Park'],propertyTypes:['Single Family'],priceMin:350000,priceMax:900000,focus:'Seller',marketing:4,negotiation:4,transactions12m:31,resources:['Contractor Rolodex','Floorplan Maps','Neighborhood Groups'],brokerageMarketing:4,domVsArea:-4,spLpVsArea:0.6,buyDiscountVsArea:0.0},
-      {id:'A6',alias:'South Loop Buyers',neighborhoods:['South Loop','Printers Row'],propertyTypes:['Condo','Loft'],priceMin:350000,priceMax:1000000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:26,resources:['New Build Access','HOA Intel','Inspection Playbook'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:0.7},
-      {id:'A7',alias:'North Shore Seller Strategist',neighborhoods:['Winnetka','Glencoe','Evanston','Wilmette'],propertyTypes:['Single Family'],priceMin:900000,priceMax:3500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:34,resources:['Staging','Aerial Video','Broker Network'],brokerageMarketing:5,domVsArea:-8,spLpVsArea:1.3,buyDiscountVsArea:0.0},
-      {id:'A8',alias:'Investors & 2-4 Units',neighborhoods:['Logan Square','Avondale','Humboldt Park'],propertyTypes:['Multi-Unit'],priceMin:400000,priceMax:1200000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:22,resources:['Rent Rolls','Cap Rate Models','Off-Market Leads'],brokerageMarketing:3,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.3},
-      {id:'A9',alias:'Hinsdale & Western Suburbs',neighborhoods:['Hinsdale','Clarendon Hills','Western Springs'],propertyTypes:['Single Family'],priceMin:800000,priceMax:2500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:36,resources:['School Guides','Luxury Print','Buyer Pools'],brokerageMarketing:5,domVsArea:-5,spLpVsArea:1.1,buyDiscountVsArea:0.0},
-      {id:'A10',alias:'Edgewater/Rogers Park Condos',neighborhoods:['Edgewater','Rogers Park'],propertyTypes:['Condo'],priceMin:200000,priceMax:500000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:28,resources:['Assessment Intel','Transit Access','HOA Docs'],brokerageMarketing:3,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:0.9}
-    ];
-
-    const METRICS={neighborhood:{label:'Neighborhood specialization',weight:{Buyer:.22,Seller:.18}},productType:{label:'Product type fit',weight:{Buyer:.12,Seller:.12}},priceBand:{label:'Price band fit',weight:{Buyer:.12,Seller:.12}},roleFocus:{label:'Buyer/Seller focus',weight:{Buyer:.10,Seller:.10}},resources:{label:'Resources to achieve goals',weight:{Buyer:.18,Seller:.22}},brokerage:{label:'Brokerage marketing power',weight:{Buyer:.08,Seller:.12}},trackRecord:{label:'Success & track record',weight:{Buyer:.18,Seller:.14}}};
-    const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
-    function overlapRatio(range,aMin,aMax){ const [pMin,pMax]=range||[0,0]; const inter=Math.max(0,Math.min(pMax,aMax)-Math.max(pMin,aMin)); const uni=Math.max(pMax,aMax)-Math.min(pMin,aMin); return uni>0?inter/uni:0 }
-    function scoreAgent(agent,answers){
-      const role=answers.role||'Buyer';
-      const neighborhood=answers.location?(agent.neighborhoods.some(n=>n.toLowerCase().includes(answers.location.toLowerCase()))?1:0):.5;
-      const productType=answers.propertyType?(agent.propertyTypes.includes(answers.propertyType)?1:0):.5;
-      const priceBand=overlapRatio(answers.priceRange,agent.priceMin,agent.priceMax)||.5;
-      const roleFocus=answers.role?(answers.role===agent.focus?1:0):.5;
-      const m=agent.marketing/5, n=agent.negotiation/5;
-      const wantsM=(answers.priorities||[]).includes('Marketing Power'), wantsN=(answers.priorities||[]).includes('Negotiation Strength');
-      const resources=role==='Seller'?clamp(.7*m+.3*n+(wantsM? .1:0)):clamp(.7*n+.3*m+(wantsN? .1:0));
-      const brokerage=agent.brokerageMarketing/5;
-      const activity=Math.min(agent.transactions12m,50)/50;
-      const domScore=role==='Seller'?clamp(.5+(-agent.domVsArea)/30):.5;
-      const spLpScore=role==='Seller'?clamp((agent.spLpVsArea+3)/6):.5;
-      const buyerDiscount=role==='Buyer'?clamp((agent.buyDiscountVsArea+2)/4):.5;
-      const performance=role==='Seller'?clamp(.6*spLpScore+.4*domScore):buyerDiscount;
-      const trackRecord=clamp(.6*performance+.4*activity);
-      const raw={neighborhood,productType,priceBand,roleFocus,resources,brokerage,trackRecord};
-      const parts=Object.entries(METRICS).map(([k,d])=>{ const w=d.weight[role], s=raw[k]??0; return {id:k,label:d.label,weight:w,score:s,points:Math.round(s*w*100)} });
-      const total=parts.reduce((s,p)=>s+p.points,0);
-      return { total, parts, raw }
-    }
-    function narrative(agent,answers){
-      const bullets=[];
-      if(answers.location){ const locs=agent.neighborhoods.filter(n=>n.toLowerCase().includes(answers.location.toLowerCase())).slice(0,2).join(', '); if(locs) bullets.push('Specializes near '+locs+'.'); }
-      if(answers.propertyType) bullets.push('Primary focus: '+answers.propertyType+'.');
-      if(answers.priceRange) bullets.push('Comfortable in your price window ($'+Number(answers.priceRange[0]).toLocaleString()+'–$'+Number(answers.priceRange[1]).toLocaleString()+').');
-      if(answers.role) bullets.push(agent.focus+'-oriented strategies.');
-      if((answers.priorities||[]).includes('Marketing Power')) bullets.push('Strong marketing: '+agent.resources.slice(0,2).join(', ')+'.');
-      if((answers.priorities||[]).includes('Negotiation Strength')) bullets.push('Known for sharp negotiations.');
-      bullets.push(agent.transactions12m+' closings in last 12 months.');
-      return bullets
-    }
-
-    /* Questionnaire state */
-    const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
-    const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
-    const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
-    const progressBar=document.getElementById('progress-bar'), stepNum=document.getElementById('step-num');
-    const PROPERTY_TYPES=['Condo','Single Family','Townhome','Loft','Multi-Unit'];
-    const PRIORITIES=['Local Expertise','Marketing Power','Negotiation Strength','New Construction Access','Off-Market Access'];
-    let step=0;
-
-    function renderPropertyTypeButtons(){
-      const holder=document.getElementById('property-types'); holder.innerHTML='';
-      PROPERTY_TYPES.forEach(pt=>{
-        const b=document.createElement('button'); b.className='card'; b.style.padding='12px'; b.textContent=pt; b.style.textAlign='left';
-        b.onclick=()=>{ state.propertyType=pt }; holder.appendChild(b);
-      });
-    }
-    function renderPriorityCheckboxes(){
-      const holder=document.getElementById('priorities'); holder.innerHTML='';
-      PRIORITIES.forEach(p=>{
-        const w=document.createElement('label'); w.className='card'; w.style.padding='12px'; w.innerHTML='<input type="checkbox" style="margin-right:8px;">'+p;
-        const cb=w.querySelector('input');
-        cb.onchange=()=>{ if(cb.checked){ if(!state.priorities.includes(p)) state.priorities.push(p) } else { state.priorities=state.priorities.filter(x=>x!==p) } };
-        holder.appendChild(w);
-      });
-    }
-    function goStep(n){
-      step=n; stepEls.forEach((el,i)=>el.classList.toggle('hidden',i!==step));
-      stepNum.textContent=(step+1); progressBar.style.width=((step+1)/6*100)+'%';
-      backBtn.disabled=(step===0); nextBtn.classList.toggle('hidden',step===5); finishBtn.classList.toggle('hidden',step!==5);
-    }
-    document.querySelectorAll('[data-role]').forEach(btn=>{ btn.onclick=()=>{ state.role=btn.getAttribute('data-role'); goStep(1) } });
-    document.getElementById('input-location').oninput=(e)=>{ state.location=e.target.value||'' };
-    document.getElementById('price-min').oninput=(e)=>{ state.priceRange[0]=+e.target.value||0 };
-    document.getElementById('price-max').oninput=(e)=>{ state.priceRange[1]=+e.target.value||0 };
-    document.querySelectorAll('.timing').forEach(btn=>{ btn.onclick=()=>{ state.timing=btn.getAttribute('data-val') } });
-    backBtn.onclick=()=>{ if(step>0) goStep(step-1) };
-    nextBtn.onclick=()=>{ if(step<5) goStep(step+1) };
-    finishBtn.onclick=()=>{ document.getElementById('results').classList.remove('hidden'); window.location.hash='#results'; renderResults() };
-    renderPropertyTypeButtons(); renderPriorityCheckboxes(); goStep(0);
-
-    /* Results */
-    function renderResults(){
-      const sc=AGENTS.map(a=>({agent:a,score:scoreAgent(a,state),bullets:narrative(a,state)})).sort((x,y)=>y.score.total-x.score.total);
-      const top3=sc.slice(0,3), rest=sc.slice(3,10);
-      const topEl=document.getElementById('top3'); topEl.innerHTML='';
-      const restEl=document.getElementById('rest'); restEl.innerHTML='';
-
-      top3.forEach(r=> topEl.appendChild(renderAgentCard(r)));
-      rest.forEach(r=> restEl.appendChild(renderAgentSmall(r)));
-    }
-
-    function renderAgentCard(r){
-      const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='14px';
-
-      const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
-      head.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;">
-          ${createRankBadge(r.score.total, { size: 44, shape: 'circle', mode: 'number' })}
-          <div>
-            <div class="xsmall">Top Match</div>
-            <div class="h3">${r.agent.alias}</div>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:24px; font-weight:800;">${r.score.total}</div>
-          <div class="xsmall">Fit score</div>
-        </div>`;
-      wrap.appendChild(head);
-
-      const ul=document.createElement('ul'); ul.className='list small'; ul.style.marginTop='8px';
-      r.bullets.forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
-      wrap.appendChild(ul);
-
-      const pillbar=document.createElement('div'); pillbar.className='pillbar'; pillbar.style.marginTop='8px';
-      r.agent.propertyTypes.forEach(t=>{ const s=document.createElement('span'); s.className='chip'; s.textContent=t; pillbar.appendChild(s) });
-      const f=document.createElement('span'); f.className='chip'; f.textContent=r.agent.focus+' focus'; pillbar.appendChild(f);
-      wrap.appendChild(pillbar);
-
-      const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='10px'; actions.style.marginTop='10px';
-      const btnChat=document.createElement('button'); btnChat.className='btn'; btnChat.textContent='Open anonymous chat';
-      const btnSave=document.createElement('button'); btnSave.className='btn btn-outline'; btnSave.textContent='Save for later';
-      actions.appendChild(btnChat); actions.appendChild(btnSave); wrap.appendChild(actions);
-
-      const note=document.createElement('div'); note.className='xsmall'; note.style.marginTop='6px'; note.textContent='No names or contact details shown. If both sides opt-in, we’ll connect you directly.';
-      wrap.appendChild(note);
-
-      btnChat.onclick = ()=> openChat(r.agent);
-      return wrap;
-    }
-
-    function renderAgentSmall(r){
-      const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='12px';
-      const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between';
-      head.innerHTML=`
-        <div class="small" style="font-weight:700; display:flex; align-items:center; gap:8px;">
-          ${createRankBadge(r.score.total, { size: 32, shape: 'circle', mode: 'number' })}
-          ${r.agent.alias}
-        </div>
-        <div class="small" style="font-weight:700;">${r.score.total}</div>`;
-      wrap.appendChild(head);
-
-      const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style.marginTop='6px';
-      r.bullets.slice(0,3).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
-      wrap.appendChild(ul);
-
-      const btn=document.createElement('button'); btn.className='btn'; btn.style.width='100%'; btn.style.marginTop='8px'; btn.textContent='Chat anonymously';
-      btn.onclick=()=> openChat(r.agent);
-      wrap.appendChild(btn);
-      return wrap;
-    }
-
-    /* Chat controls */
-    const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatMin=document.getElementById('chat-min'); const chatFab=document.getElementById('chat-fab');
-    function openChat(agent){
-      document.getElementById('chat-title').textContent=agent.alias;
-      const msgs=document.getElementById('chat-messages'); msgs.innerHTML='';
-      const seed=[{who:'system',text:"Anonymous chat created. Share only what you're comfortable with."},{who:agent.alias,text:`Hi there! I can advise on ${(state.propertyType||'your goals').toLowerCase()} in ${state.location || 'your area'}.`}];
-      seed.forEach(m=>appendMsg(m.who,m.text)); showModal();
-    }
-    function showModal(){ modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false'); document.getElementById('chat-input').focus() }
-    function hideModal(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true') }
-    function appendMsg(who,text){
-      const box=document.createElement('div'); box.className='card'; box.style.padding='8px 10px'; box.style.maxWidth='80%'; box.style.margin='6px 0';
-      if(who==='You'){ box.style.marginLeft='auto'; box.style.background='#111827'; box.style.color='#fff' }
-      const whoEl=document.createElement('div'); whoEl.className='xsmall'; whoEl.textContent=who;
-      const textEl=document.createElement('div'); textEl.className='small'; textEl.style.marginTop='4px'; textEl.textContent=text;
-      box.appendChild(whoEl); box.appendChild(textEl);
-      const msgs=document.getElementById('chat-messages'); msgs.appendChild(box); msgs.scrollTop=msgs.scrollHeight;
-    }
-    document.getElementById('chat-send').onclick=()=>{ const inp=document.getElementById('chat-input'); const t=(inp.value||'').trim(); if(!t) return; appendMsg('You',t); inp.value='' };
-    chatClose.onclick=hideModal; chatMin.onclick=hideModal; modal.addEventListener('click',e=>{ if(e.target===modal) hideModal() }); document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideModal() });
-    chatFab.onclick=()=>{ if(modal.classList.contains('hidden')){ document.getElementById('chat-title').textContent='Agent'; const msgs=document.getElementById('chat-messages'); msgs.innerHTML=''; appendMsg('system',"Anonymous chat created. Share only what you're comfortable with."); showModal() } else { hideModal() } };
-
-    /* CSV pilot */
-    document.getElementById('load-sample').onclick=()=>{ const sample=`id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
-X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
-X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
-X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0`; document.getElementById('csv').value=sample; document.getElementById('status').textContent='Loaded sample. You can modify before importing.' };
-    document.getElementById('import').onclick=()=>{ try{ const txt=document.getElementById('csv').value||''; const lines=txt.trim().split(/\r?\n/); if(lines.length<2){ document.getElementById('status').textContent='No rows detected. Check your CSV.'; return } const headers=lines[0].split(',').map(h=>h.trim()); const rows=[]; for(let i=1;i<lines.length;i++){ if(!lines[i].trim()) continue; const cols=lines[i].split(',').map(c=>c.trim()); const obj={}; headers.forEach((h,idx)=>obj[h]=cols[idx]??''); const toList=v=>v?v.split(/;|\|/).map(x=>x.trim()).filter(Boolean):[]; rows.push({ id:obj.id||'R'+i, alias:obj.alias||('Agent '+i), neighborhoods:toList(obj.neighborhoods), propertyTypes:toList(obj.propertyTypes), priceMin:parseFloat(obj.priceMin||0), priceMax:parseFloat(obj.priceMax||0), focus:(obj.focus||'Seller').trim(), marketing:parseInt(obj.marketing||3), negotiation:parseInt(obj.negotiation||3), transactions12m:parseInt(obj.transactions12m||0), resources:toList(obj.resources), brokerageMarketing:parseInt(obj.brokerageMarketing||3), domVsArea:parseFloat(obj.domVsArea||0), spLpVsArea:parseFloat(obj.spLpVsArea||0), buyDiscountVsArea:parseFloat(obj.buyDiscountVsArea||0) }) } AGENTS=rows; document.getElementById('status').textContent='Imported '+rows.length+' agents. Matches now use your data.'; document.getElementById('results').classList.remove('hidden'); renderResults(); window.location.hash='#results' } catch(e){ document.getElementById('status').textContent='Import error. Please check formatting.' } };
-    document.getElementById('year').textContent=new Date().getFullYear();
-  </script>
 </body>
 </html>
