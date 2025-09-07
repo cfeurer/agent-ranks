@@ -1,521 +1,843 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agent Ranks — Private, Unbiased Agent Matching (Demo)</title>
-<style>
-  :root{
-    --ink:#0F172A; --muted:#475569; --border:#E2E8F0; --bg:#FFFFFF; --shadow:0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.06);
-  }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);background:#fff}
-  a{color:var(--ink);text-decoration:none}
-  .container{max-width:1100px;margin:0 auto;padding:0 16px}
-  .btn{background:#111827;color:#fff;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
-  .btn-outline{background:#fff;color:#111827;border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
-  .card{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
-  .section{padding:48px 0}
-  .h1{font-size:40px;line-height:1.1;font-weight:800;letter-spacing:-.02em}
-  .h2{font-size:28px;font-weight:800;letter-spacing:-.02em}
-  .h3{font-size:16px;font-weight:800}
-  .muted{color:var(--muted)}
-  .row{display:grid;grid-template-columns:1fr;gap:16px}
-  @media(min-width:720px){ .row-2{grid-template-columns:1.2fr .8fr} .row-3{grid-template-columns:repeat(3,1fr)} }
-  header{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:50}
-  nav a{margin-right:16px;font-size:14px}
-  .pill{display:inline-flex;padding:6px 12px;border-radius:999px;border:1px solid rgba(17,24,39,.15);background:rgba(17,24,39,.03);font-size:12px;font-weight:700}
-  .hero-visual{height:320px;border-radius:16px;border:1px solid var(--border);overflow:hidden;position:relative}
-  .hero-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .6s}
-  .hero-img.active{opacity:1}
-  .hero-caption{position:absolute;left:16px;right:16px;bottom:16px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-  .progress{height:8px;width:180px;background:#f1f5f9;border-radius:999px;overflow:hidden}
-  .progress>div{height:100%;background:#111827}
-  .grid-2{display:grid;grid-template-columns:1fr;gap:12px}
-  @media(min-width:700px){ .grid-2{grid-template-columns:repeat(2,1fr)} }
-  .grid-3{display:grid;grid-template-columns:1fr;gap:12px}
-  @media(min-width:700px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
-  .list{list-style:disc;padding-left:18px}
-  .small{font-size:12px}.xsmall{font-size:11px;color:#64748b}
-  .pillbar{display:flex;gap:8px;flex-wrap:wrap}
-  .choice{padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff;text-align:left;cursor:pointer}
-  .choice.selected{border-color:#111827;background:#111827;color:#fff}
-  .hidden{display:none}
-  .footer{border-top:1px solid var(--border);background:#fff}
-  /* Mobile-safe header */
-  #menu-btn{display:none}
-  @media(max-width:700px){ .nav-links{display:none!important} #menu-btn{display:inline-flex!important} }
-  .mobile-nav{display:none}
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
-  .modal.hidden{display:none!important}
-</style>
-</head>
-<body>
-  <!-- HEADER (mobile-safe) -->
-  <header>
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#a855f7,#f43f5e)"></div>
-        <strong>Agent Ranks</strong>
-      </div>
-      <nav class="nav-links">
-        <a href="#how">How it works</a>
-        <a href="#questionnaire">Get matched</a>
-        <a href="#results">Results</a>
-        <a href="#admin">Data (CSV)</a>
-      </nav>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <a href="#questionnaire" class="btn">Start</a>
-        <button id="menu-btn" class="btn-outline" aria-label="Open menu">Menu</button>
-      </div>
-    </div>
-    <div id="mobile-nav" class="mobile-nav">
-      <div class="container" style="padding:8px 16px;display:grid;gap:10px;border-top:1px solid var(--border)">
-        <a href="#how">How it works</a>
-        <a href="#questionnaire">Get matched</a>
-        <a href="#results">Results</a>
-        <a href="#admin">Data (CSV)</a>
-      </div>
-    </div>
-  </header>
+import React, { useEffect, useMemo, useState } from "react";
 
-  <!-- HERO -->
-  <section class="section">
-    <div class="container row row-2">
-      <div>
-        <span class="pill">Unbiased • Credit Score Level Ratings</span>
-        <h1 class="h1" style="margin-top:12px;">Agent Ranks — find your best-fit real estate agent, privately</h1>
-        <p class="muted" style="margin-top:8px;max-width:600px">
-          50+ matching signals (neighborhood, product type, price band, buyer/seller focus, marketing power, track record).
-          We present your best 3 matches — with no names or contact shared until <em>both</em> sides opt-in.
-        </p>
-        <div style="display:flex;gap:10px;margin-top:16px">
-          <a class="btn" href="#questionnaire">Start 2-minute match</a>
-          <a class="btn btn-outline" href="#how">How it works</a>
-        </div>
+/**
+ * Agent Ranks — Best-fit Agent (Private Demo) with CSV Import
+ * Single-file React app (Tailwind classes; no external deps).
+ *
+ * Features:
+ * - Mobile-safe navbar (hamburger)
+ * - Hero (rotating images + on-image captions)
+ * - Questionnaire (6 steps) → Results (anonymized) → Anonymous chat
+ * - Admin → Data (CSV import): file upload or paste; Load sample; live replace agents
+ *
+ * Notes:
+ * - No outbound emails/texts/backends. All data lives in memory.
+ * - CSV parser is pragmatic (comma-separated rows, semicolon-separated lists).
+ *   Keep values simple (no quoted embedded commas). Good enough for pilot/testing.
+ */
 
-        <div class="card" style="margin-top:16px;padding:12px 14px;background:#111827;color:#fff">
-          <div id="testi-quote" style="font-size:14px">“We met three great options anonymously and chose the one who sold our place in 11 days.”</div>
-          <div id="testi-who" class="xsmall" style="color:#cbd5e1;margin-top:4px">— Seller in West Loop</div>
-        </div>
-      </div>
-
-      <!-- Rotating image with on-image caption -->
-      <div class="hero-visual" id="heroVisual">
-        <div class="hero-img active" id="slide0" style="background-image:
-          linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
-          url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop');"></div>
-        <div class="hero-img" id="slide1" style="background-image:
-          linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
-          url('https://images.unsplash.com/photo-1560518883-90a2e0b8d29d?q=80&w=1600&auto=format&fit=crop');"></div>
-        <div class="hero-img" id="slide2" style="background-image:
-          linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 100%),
-          url('https://images.unsplash.com/photo-1560184897-a50f6f7d518f?q=80&w=1600&auto=format&fit=crop');"></div>
-        <div class="hero-caption">
-          <div class="h3" id="capTitle" style="color:#fff">Accepted over ask</div>
-          <div class="xsmall" id="capSub" style="color:#fff">Bucktown • SFH • 11 days</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section id="how" class="section">
-    <div class="container">
-      <h2 class="h2">How it works</h2>
-      <p class="muted" style="margin-top:6px">Unbiased, data-driven matches. Comfortable, private introductions.</p>
-      <ol class="row row-3" style="margin-top:16px">
-        <li class="card" style="padding:18px"><div class="pill">1</div><div class="h3" style="margin-top:8px">Tell us your goals</div><div class="small muted">Buyer or seller, neighborhood, property type, price band, timing, and key priorities.</div></li>
-        <li class="card" style="padding:18px"><div class="pill">2</div><div class="h3" style="margin-top:8px">AI-assisted matching</div><div class="small muted">We weigh 50+ signals to rank agents most likely to achieve your outcome.</div></li>
-        <li class="card" style="padding:18px"><div class="pill">3</div><div class="h3" style="margin-top:8px">Anonymous introductions</div><div class="small muted">Review short narratives for your top matches without exposing identity or contact info.</div></li>
-        <li class="card" style="padding:18px"><div class="pill">4</div><div class="h3" style="margin-top:8px">Mutual opt-in & connect</div><div class="small muted">If you approve, we open a private chat. When both sides agree, we connect directly.</div></li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- QUESTIONNAIRE -->
-  <section id="questionnaire" class="section">
-    <div class="container">
-      <h2 class="h2">Get matched in under 2 minutes</h2>
-      <p class="muted">We only share anonymized needs until you choose to connect.</p>
-      <div class="card" style="margin-top:14px;padding:16px">
-
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div class="xsmall">Step <span id="step-num">1</span> of 6</div>
-          <div class="progress"><div id="progress-bar" style="width:16.66%"></div></div>
-        </div>
-
-        <div id="step-0" style="margin-top:12px">
-          <div class="h3">Are you buying or selling?</div>
-          <div class="grid-2" style="margin-top:10px">
-            <button class="choice" data-role="Buyer"><div class="h3">Buyer</div><div class="small muted">We’ll prioritize negotiation and availability.</div></button>
-            <button class="choice" data-role="Seller"><div class="h3">Seller</div><div class="small muted">We’ll prioritize marketing power and days-on-market.</div></button>
-          </div>
-        </div>
-
-        <div id="step-1" class="hidden" style="margin-top:12px">
-          <div class="h3">What neighborhood or area?</div>
-          <input id="input-location" class="input" placeholder="e.g., West Loop, Lincoln Park, Hinsdale"
-                 style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px">
-          <div class="xsmall" style="margin-top:6px">Tip: You can be specific (e.g., “Bucktown”) or broader (e.g., “North Shore”).</div>
-        </div>
-
-        <div id="step-2" class="hidden" style="margin-top:12px">
-          <div class="h3">Property type</div>
-          <div class="grid-3" style="margin-top:10px" id="property-types"></div>
-        </div>
-
-        <div id="step-3" class="hidden" style="margin-top:12px">
-          <div class="h3">Price range</div>
-          <div class="grid-2" style="margin-top:10px">
-            <div><div class="xsmall">Min</div><input id="price-min" type="number" class="input" value="400000"
-              style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px"></div>
-            <div><div class="xsmall">Max</div><input id="price-max" type="number" class="input" value="1000000"
-              style="width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px"></div>
-          </div>
-          <div class="xsmall" style="margin-top:6px">Change later if you’re uncertain.</div>
-        </div>
-
-        <div id="step-4" class="hidden" style="margin-top:12px">
-          <div class="h3">What matters most?</div>
-          <div id="priorities" class="grid-2" style="margin-top:10px"></div>
-        </div>
-
-        <div id="step-5" class="hidden" style="margin-top:12px">
-          <div class="h3">Timing</div>
-          <div class="grid-3" style="margin-top:10px">
-            <button class="choice timing" data-val="0-3 months">0-3 months</button>
-            <button class="choice timing" data-val="3-6 months">3-6 months</button>
-            <button class="choice timing" data-val="6-12 months">6-12 months</button>
-          </div>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
-          <button class="btn btn-outline" id="btn-back">Back</button>
-          <button class="btn" id="btn-next">Next</button>
-          <button class="btn hidden" id="btn-finish">See my matches</button>
-        </div>
-        <div class="xsmall" style="margin-top:8px">Your details remain private. We only open a chat if you approve your matches and the agent agrees.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RESULTS -->
-  <section id="results" class="section hidden">
-    <div class="container">
-      <h2 class="h2">Your best-fit matches</h2>
-      <p class="muted">We highlight the top three based on your goals. You can still browse up to ten options.</p>
-      <div id="top3" class="row row-3" style="margin-top:16px"></div>
-      <div style="margin-top:28px">
-        <div class="h3">Other relevant options</div>
-        <div id="rest" class="row row-3" style="margin-top:12px"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ADMIN: DATA (CSV IMPORT) -->
-  <section id="admin" class="section">
-    <div class="container">
-      <h2 class="h2">Data (CSV import)</h2>
-      <p class="muted">Easiest: copy from Excel/Sheets (including header), paste below, click Import. You can also upload a .csv file.</p>
-      <div class="card" style="padding:16px;margin-top:12px">
-        <div class="small">Header:
-          <code>id, alias, neighborhoods (;), propertyTypes (;), priceMin, priceMax, focus, marketing, negotiation, transactions12m, resources (;), brokerageMarketing, domVsArea, spLpVsArea, buyDiscountVsArea</code>
-        </div>
-        <div class="grid-2" style="margin-top:12px">
-          <div>
-            <div class="xsmall">Upload .csv</div>
-            <input type="file" id="csv-file" accept=".csv,text/csv" style="width:100%;margin-top:6px">
-            <div id="file-note" class="xsmall" style="margin-top:6px"></div>
-          </div>
-          <div>
-            <div class="xsmall">…or paste here</div>
-            <textarea id="csv-text" rows="8" class="textarea" style="margin-top:6px;width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px"
-placeholder="id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
-X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
-X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
-X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0"></textarea>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
-          <button id="btn-load-sample" class="btn btn-outline">Load sample</button>
-          <button id="btn-import" class="btn">Import</button>
-          <span id="status" class="xsmall"></span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CHAT MODAL -->
-  <div id="chat-modal" class="modal hidden" aria-hidden="true">
-    <div class="card" role="dialog" aria-modal="true" style="width:min(720px,100%);max-height:80vh;display:flex;flex-direction:column">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)">
-        <div><div class="xsmall">Anonymous chat</div><div class="h3" id="chat-title">Agent</div></div>
-        <button class="btn btn-outline" id="chat-close">Close</button>
-      </div>
-      <div id="chat-messages" style="padding:12px;overflow:auto;height:50vh"></div>
-      <div style="display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)">
-        <input id="chat-input" class="input" placeholder="Type a message…" style="flex:1;border:1px solid var(--border);border-radius:12px;padding:10px 12px">
-        <button class="btn" id="chat-send">Send</button>
-      </div>
-      <div class="xsmall" style="padding:10px 12px;border-top:1px solid var(--border)">Demo mode: no identities or contact details are shared. No emails or texts are sent.</div>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:16px 0">
-      <div class="xsmall">© <span id="year"></span> Agent Ranks — Demo Concept</div>
-      <div class="xsmall"><a href="#how">How it works</a> · <a href="#questionnaire">Get matched</a> · <a href="#results">Results</a> · <a href="#admin">Data</a></div>
-    </div>
-  </footer>
-
-<script>
-/* ------------------ Mobile menu ------------------ */
-document.getElementById('menu-btn').onclick = () => {
-  const m = document.getElementById('mobile-nav');
-  m.style.display = (m.style.display==='block') ? 'none' : 'block';
+/* ----------------------------- Small helpers ----------------------------- */
+const cx = (...xs) => xs.filter(Boolean).join(" ");
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const overlapRatio = ([pMin, pMax], aMin, aMax) => {
+  const inter = Math.max(0, Math.min(pMax, aMax) - Math.max(pMin, aMin));
+  const uni = Math.max(pMax, aMax) - Math.min(pMin, aMin);
+  return uni > 0 ? inter / uni : 0;
 };
 
-/* ------------------ Hero rotation + testimonials ------------------ */
+/* ----------------------------- Testimonials & hero ----------------------------- */
 const TESTIMONIALS = [
-  {q:"We met three great options anonymously and chose the one who sold our place in 11 days.",w:"Seller in West Loop"},
-  {q:"The match understood we were first-time buyers in Lincoln Park at $800k. Perfect fit.",w:"Buyer in Lincoln Park"},
-  {q:"Zero awkward phone calls. Just a private chat until both sides said yes.",w:"Seller in Bucktown"}
+  { quote: "We met three great options anonymously and chose the one who sold our place in 11 days.", who: "Seller in West Loop" },
+  { quote: "The match understood we were first-time buyers in Lincoln Park at $800k. Perfect fit.", who: "Buyer in Lincoln Park" },
+  { quote: "Zero awkward phone calls. Just a private chat until both sides said yes.", who: "Seller in Bucktown" },
 ];
-let tIdx=0; setInterval(()=>{ tIdx=(tIdx+1)%TESTIMONIALS.length;
-  document.getElementById('testi-quote').textContent='“'+TESTIMONIALS[tIdx].q+'”';
-  document.getElementById('testi-who').textContent='— '+TESTIMONIALS[tIdx].w;
-}, 4000);
-let slideIdx=0; const ids=['slide0','slide1','slide2']; setInterval(()=>{ slideIdx=(slideIdx+1)%ids.length; ids.forEach((id,i)=>{ document.getElementById(id).classList.toggle('active', i===slideIdx) }) }, 3500);
 
-/* ------------------ Data + scoring ------------------ */
-let AGENTS = [
-  {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1},
-  {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0},
-  {id:'A3',alias:'First-Time Buyer Guide',neighborhoods:['Lincoln Square','Ravenswood','Avondale','Logan Square'],propertyTypes:['Condo','Townhome'],priceMin:300000,priceMax:800000,focus:'Buyer',marketing:3,negotiation:5,transactions12m:38,resources:['Lender Intros','Buyer Workshops','Offer Playbooks'],brokerageMarketing:4,domVsArea:0,spLpVsArea:0.0,buyDiscountVsArea:1.0},
-  {id:'A4',alias:'Luxury Lakefront Team',neighborhoods:['Gold Coast','Streeterville','Old Town'],propertyTypes:['Condo','Single Family'],priceMin:1200000,priceMax:6000000,focus:'Seller',marketing:5,negotiation:4,transactions12m:29,resources:['International Network','Print Features','Private Showings'],brokerageMarketing:5,domVsArea:-6,spLpVsArea:1.6,buyDiscountVsArea:0.0}
+// Replace these with your licensed images later
+const HERO_SLIDES = [
+  {
+    badge: "SOLD",
+    title: "Accepted over ask",
+    caption: "Bucktown • SFH • 11 days",
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop",
+  },
+  {
+    badge: "UNDER CONTRACT",
+    title: "Keys at the closing table",
+    caption: "Lincoln Park • Condo • $800k",
+    image: "https://images.unsplash.com/photo-1560518883-90a2e0b8d29d?q=80&w=1600&auto=format&fit=crop",
+  },
+  {
+    badge: "PRIVATE",
+    title: "Off-market preview",
+    caption: "North Shore • Private showing",
+    image: "https://images.unsplash.com/photo-1560184897-a50f6f7d518f?q=80&w=1600&auto=format&fit=crop",
+  },
 ];
+
+/* ----------------------------- Default agent seed ----------------------------- */
+const SEED_AGENTS = [
+  {
+    id: "A1",
+    alias: "North Side Neighborhood Pro",
+    neighborhoods: ["Lincoln Park", "Lakeview", "Bucktown", "Wicker Park"],
+    propertyTypes: ["Condo", "Single Family", "Townhome"],
+    priceMin: 500000, priceMax: 1500000, focus: "Seller",
+    marketing: 5, negotiation: 4, transactions12m: 42,
+    resources: ["Staging", "Pro Video", "Paid Social"],
+    brokerageMarketing: 5, domVsArea: -7, spLpVsArea: 1.2, buyDiscountVsArea: 0.1,
+  },
+  {
+    id: "A2",
+    alias: "Downtown High-Rise Specialist",
+    neighborhoods: ["West Loop", "River North", "Loop"],
+    propertyTypes: ["Condo", "Loft"],
+    priceMin: 600000, priceMax: 2000000, focus: "Seller",
+    marketing: 5, negotiation: 3, transactions12m: 55,
+    resources: ["3D Tours", "In-Building Network", "Broker Events"],
+    brokerageMarketing: 5, domVsArea: -9, spLpVsArea: 0.8, buyDiscountVsArea: 0.0,
+  },
+  {
+    id: "A3",
+    alias: "First-Time Buyer Guide",
+    neighborhoods: ["Lincoln Square", "Ravenswood", "Avondale", "Logan Square"],
+    propertyTypes: ["Condo", "Townhome"],
+    priceMin: 300000, priceMax: 800000, focus: "Buyer",
+    marketing: 3, negotiation: 5, transactions12m: 38,
+    resources: ["Lender Intros", "Buyer Workshops", "Offer Playbooks"],
+    brokerageMarketing: 4, domVsArea: 0, spLpVsArea: 0.0, buyDiscountVsArea: 1.0,
+  },
+  {
+    id: "A4",
+    alias: "Luxury Lakefront Team",
+    neighborhoods: ["Gold Coast", "Streeterville", "Old Town"],
+    propertyTypes: ["Condo", "Single Family"],
+    priceMin: 1200000, priceMax: 6000000, focus: "Seller",
+    marketing: 5, negotiation: 4, transactions12m: 29,
+    resources: ["International Network", "Print Features", "Private Showings"],
+    brokerageMarketing: 5, domVsArea: -6, spLpVsArea: 1.6, buyDiscountVsArea: 0.0,
+  },
+  {
+    id: "A6",
+    alias: "South Loop Buyers",
+    neighborhoods: ["South Loop", "Printers Row"],
+    propertyTypes: ["Condo", "Loft"],
+    priceMin: 350000, priceMax: 1000000, focus: "Buyer",
+    marketing: 3, negotiation: 5, transactions12m: 26,
+    resources: ["New Build Access", "HOA Intel", "Inspection Playbook"],
+    brokerageMarketing: 4, domVsArea: 0, spLpVsArea: 0.0, buyDiscountVsArea: 0.7,
+  },
+  {
+    id: "A7",
+    alias: "North Shore Seller Strategist",
+    neighborhoods: ["Winnetka", "Glencoe", "Evanston", "Wilmette"],
+    propertyTypes: ["Single Family"],
+    priceMin: 900000, priceMax: 3500000, focus: "Seller",
+    marketing: 5, negotiation: 4, transactions12m: 34,
+    resources: ["Staging", "Aerial Video", "Broker Network"],
+    brokerageMarketing: 5, domVsArea: -8, spLpVsArea: 1.3, buyDiscountVsArea: 0.0,
+  },
+];
+
+/* ----------------------------- Scoring model ----------------------------- */
 const METRICS = {
-  neighborhood:{label:'Neighborhood specialization',weight:{Buyer:.22,Seller:.18}},
-  productType:{label:'Product type fit',weight:{Buyer:.12,Seller:.12}},
-  priceBand:{label:'Price band fit',weight:{Buyer:.12,Seller:.12}},
-  roleFocus:{label:'Buyer/Seller focus',weight:{Buyer:.10,Seller:.10}},
-  resources:{label:'Resources to achieve goals',weight:{Buyer:.18,Seller:.22}},
-  brokerage:{label:'Brokerage marketing power',weight:{Buyer:.08,Seller:.12}},
-  trackRecord:{label:'Success & track record',weight:{Buyer:.18,Seller:.14}}
+  neighborhood: { label: "Neighborhood specialization", weight: { Buyer: 0.22, Seller: 0.18 } },
+  productType:  { label: "Product type fit",          weight: { Buyer: 0.12, Seller: 0.12 } },
+  priceBand:    { label: "Price band fit",            weight: { Buyer: 0.12, Seller: 0.12 } },
+  roleFocus:    { label: "Buyer/Seller focus",        weight: { Buyer: 0.10, Seller: 0.10 } },
+  resources:    { label: "Resources to achieve goals",weight: { Buyer: 0.18, Seller: 0.22 } },
+  brokerage:    { label: "Brokerage marketing power", weight: { Buyer: 0.08, Seller: 0.12 } },
+  trackRecord:  { label: "Success & track record",    weight: { Buyer: 0.18, Seller: 0.14 } },
 };
-function clamp(x,a=0,b=1){ return Math.max(a,Math.min(b,x)) }
-function overlapRatio(range,aMin,aMax){
-  const [pMin,pMax]=range||[0,0]; const inter=Math.max(0,Math.min(pMax,aMax)-Math.max(pMin,aMin));
-  const uni=Math.max(pMax,aMax)-Math.min(pMin,aMin); return uni>0?inter/uni:0
+
+function scoreAgent(agent, answers) {
+  const role = answers.role || "Buyer";
+
+  const neighborhood = answers.location
+    ? (agent.neighborhoods || []).some(n => n.toLowerCase().includes(answers.location.toLowerCase())) ? 1 : 0
+    : 0.5;
+
+  const productType = answers.propertyType
+    ? (agent.propertyTypes || []).includes(answers.propertyType) ? 1 : 0
+    : 0.5;
+
+  const priceBand = answers.priceRange
+    ? overlapRatio(answers.priceRange, agent.priceMin || 0, agent.priceMax || 0)
+    : 0.5;
+
+  const roleFocus = answers.role ? (answers.role === agent.focus ? 1 : 0) : 0.5;
+
+  const m = (agent.marketing || 0) / 5;
+  const n = (agent.negotiation || 0) / 5;
+  const wantsM = (answers.priorities || []).includes("Marketing Power");
+  const wantsN = (answers.priorities || []).includes("Negotiation Strength");
+  const resources = role === "Seller"
+    ? clamp(0.7 * m + 0.3 * n + (wantsM ? 0.1 : 0))
+    : clamp(0.7 * n + 0.3 * m + (wantsN ? 0.1 : 0));
+
+  const brokerage = (agent.brokerageMarketing || 0) / 5;
+
+  const activity = Math.min(agent.transactions12m || 0, 50) / 50;
+  const domScore = role === "Seller" ? clamp(0.5 + (-(agent.domVsArea || 0)) / 30) : 0.5;
+  const spLpScore = role === "Seller" ? clamp(((agent.spLpVsArea || 0) + 3) / 6) : 0.5;
+  const buyerDiscount = role === "Buyer" ? clamp(((agent.buyDiscountVsArea || 0) + 2) / 4) : 0.5;
+  const performance = role === "Seller" ? clamp(0.6 * spLpScore + 0.4 * domScore) : buyerDiscount;
+  const trackRecord = clamp(0.6 * performance + 0.4 * activity);
+
+  const raw = { neighborhood, productType, priceBand, roleFocus, resources, brokerage, trackRecord };
+  const parts = Object.entries(METRICS).map(([key, def]) => {
+    const weight = def.weight[role];
+    const score = raw[key] ?? 0;
+    return { id: key, label: def.label, weight, score, points: Math.round(score * weight * 100) };
+  });
+  const total = parts.reduce((s, p) => s + p.points, 0);
+  return { total, parts, raw };
 }
-function scoreAgent(agent,answers){
-  const role=answers.role||'Buyer';
-  const neighborhood=answers.location?(agent.neighborhoods||[]).some(n=>n.toLowerCase().includes(answers.location.toLowerCase()))?1:0:.5;
-  const productType=answers.propertyType?((agent.propertyTypes||[]).includes(answers.propertyType)?1:0):.5;
-  const priceBand=answers.priceRange?overlapRatio(answers.priceRange,agent.priceMin||0,agent.priceMax||0):.5;
-  const roleFocus=answers.role?(answers.role===agent.focus?1:0):.5;
-  const m=(agent.marketing||0)/5, n=(agent.negotiation||0)/5;
-  const wantsM=(answers.priorities||[]).includes('Marketing Power'), wantsN=(answers.priorities||[]).includes('Negotiation Strength');
-  const resources=role==='Seller'?clamp(.7*m+.3*n+(wantsM?.1:0)):clamp(.7*n+.3*m+(wantsN?.1:0));
-  const brokerage=(agent.brokerageMarketing||0)/5;
-  const activity=Math.min(agent.transactions12m||0,50)/50;
-  const domScore=role==='Seller'?clamp(.5+(-(agent.domVsArea||0))/30):.5;
-  const spLpScore=role==='Seller'?clamp(((agent.spLpVsArea||0)+3)/6):.5;
-  const buyerDiscount=role==='Buyer'?clamp(((agent.buyDiscountVsArea||0)+2)/4):.5;
-  const performance=role==='Seller'?clamp(.6*spLpScore+.4*domScore):buyerDiscount;
-  const trackRecord=clamp(.6*performance+.4*activity);
-  const raw={neighborhood,productType,priceBand,roleFocus,resources,brokerage,trackRecord};
-  const parts=Object.entries(METRICS).map(([k,d])=>{ const w=d.weight[role], s=raw[k]??0; return {id:k,label:d.label,weight:w,score:s,points:Math.round(s*w*100)} });
-  const total=parts.reduce((s,p)=>s+p.points,0);
-  return { total, parts, raw }
-}
-function narrative(agent,answers){
-  const bullets=[];
-  if(answers.location){
-    const locs=(agent.neighborhoods||[]).filter(n=>n.toLowerCase().includes(answers.location.toLowerCase())).slice(0,2).join(', ');
-    if(locs) bullets.push('Specializes near '+locs+'.');
+
+function narrative(agent, answers) {
+  const bullets = [];
+  if (answers.location) {
+    const locs = (agent.neighborhoods || [])
+      .filter(n => n.toLowerCase().includes(answers.location.toLowerCase()))
+      .slice(0, 2).join(", ");
+    if (locs) bullets.push(`Specializes near ${locs}.`);
   }
-  if(answers.propertyType) bullets.push('Primary focus: '+answers.propertyType+'.');
-  if(answers.priceRange) bullets.push('Comfortable in your price window ($'+answers.priceRange[0].toLocaleString()+'–$'+answers.priceRange[1].toLocaleString()+').');
-  if(answers.role) bullets.push(agent.focus+'-oriented strategies.');
-  if((answers.priorities||[]).includes('Marketing Power')) bullets.push('Strong marketing: '+(agent.resources||[]).slice(0,2).join(', ')+'.');
-  if((answers.priorities||[]).includes('Negotiation Strength')) bullets.push('Known for sharp negotiations.');
-  bullets.push((agent.transactions12m||0)+' closings in last 12 months.');
+  if (answers.propertyType) bullets.push(`Primary focus: ${answers.propertyType}.`);
+  if (answers.priceRange) bullets.push(
+    `Comfortable in your price window ($${answers.priceRange[0].toLocaleString()}–$${answers.priceRange[1].toLocaleString()}).`
+  );
+  if (answers.role) bullets.push(`${agent.focus}-oriented strategies.`);
+  if ((answers.priorities || []).includes("Marketing Power"))
+    bullets.push(`Strong marketing: ${(agent.resources || []).slice(0, 2).join(", ")}.`);
+  if ((answers.priorities || []).includes("Negotiation Strength"))
+    bullets.push(`Known for sharp negotiations.`);
+  bullets.push(`${agent.transactions12m || 0} closings in last 12 months.`);
   return bullets;
 }
 
-/* ------------------ Questionnaire wiring ------------------ */
-const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
-const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
-const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
-const progressBar=document.getElementById('progress-bar'), stepNum=document.getElementById('step-num');
-const PROPERTY_TYPES=['Condo','Single Family','Townhome','Loft','Multi-Unit'];
-const PRIORITIES=['Local Expertise','Marketing Power','Negotiation Strength','New Construction Access','Off-Market Access'];
-let step=0;
-
-(function renderPropertyTypeButtons(){
-  const holder=document.getElementById('property-types'); holder.innerHTML='';
-  PROPERTY_TYPES.forEach(pt=>{ const b=document.createElement('button'); b.className='choice'; b.textContent=pt; b.onclick=()=>{ state.propertyType=pt; holder.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected')); b.classList.add('selected') }; holder.appendChild(b) })
-})();
-(function renderPriorityCheckboxes(){
-  const holder=document.getElementById('priorities'); holder.innerHTML='';
-  PRIORITIES.forEach(p=>{ const b=document.createElement('label'); b.className='choice'; b.textContent=p; b.onclick=()=>{ const i=state.priorities.indexOf(p); if(i>=0){ state.priorities.splice(i,1); b.classList.remove('selected') } else { state.priorities.push(p); b.classList.add('selected') } }; holder.appendChild(b) })
-})();
-document.querySelectorAll('[data-role]').forEach(btn=>{
-  btn.onclick=()=>{ state.role=btn.getAttribute('data-role'); document.querySelectorAll('[data-role]').forEach(x=>x.classList.remove('selected')); btn.classList.add('selected'); goStep(1) }
-});
-document.getElementById('input-location').oninput=(e)=>{ state.location=e.target.value||'' };
-document.getElementById('price-min').oninput=(e)=>{ state.priceRange[0]=+e.target.value||0 };
-document.getElementById('price-max').oninput=(e)=>{ state.priceRange[1]=+e.target.value||0 };
-document.querySelectorAll('.timing').forEach(btn=>{
-  btn.onclick=()=>{ state.timing=btn.getAttribute('data-val'); document.querySelectorAll('.timing').forEach(x=>x.classList.remove('selected')); btn.classList.add('selected') }
-});
-function goStep(n){
-  step=n; stepEls.forEach((el,i)=>el.classList.toggle('hidden',i!==step));
-  stepNum.textContent=(step+1); progressBar.style.width=((step+1)/6*100)+'%';
-  backBtn.disabled=(step===0); nextBtn.classList.toggle('hidden',step===5); finishBtn.classList.toggle('hidden',step!==5)
-}
-backBtn.onclick=()=>{ if(step>0) goStep(step-1) };
-nextBtn.onclick=()=>{ if(step<5) goStep(step+1) };
-finishBtn.onclick=()=>{ document.getElementById('results').classList.remove('hidden'); window.location.hash='#results'; renderResults() };
-goStep(0);
-
-/* ------------------ Results render ------------------ */
-function renderResults(){
-  const ranked = (AGENTS||[]).map(a=>({ agent:a, score:scoreAgent(a,state), bullets:narrative(a,state) })).sort((x,y)=> y.score.total-x.score.total);
-  const top3=ranked.slice(0,3), rest=ranked.slice(3,10);
-  const topEl=document.getElementById('top3'); topEl.innerHTML='';
-  const restEl=document.getElementById('rest'); restEl.innerHTML='';
-  top3.forEach(r=> topEl.appendChild(renderAgentCard(r)));
-  rest.forEach(r=> restEl.appendChild(renderAgentSmall(r)));
-}
-function renderAgentCard(r){
-  const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='14px';
-  const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
-  head.innerHTML=`<div><div class="xsmall">Top Match</div><div class="h3">${r.agent.alias}</div></div>
-                  <div style="text-align:right"><div style="font-size:24px;font-weight:800">${r.score.total}</div><div class="xsmall">Fit score</div></div>`;
-  wrap.appendChild(head);
-
-  const ul=document.createElement('ul'); ul.className='list small'; ul.style.marginTop='8px';
-  r.bullets.forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
-  wrap.appendChild(ul);
-
-  const controls=document.createElement('div'); controls.style.display='flex'; controls.style.gap='14px'; controls.style.marginTop='8px';
-  const why=document.createElement('button'); why.className='small'; why.style.textDecoration='underline'; why.style.border=0; why.style.background='transparent'; why.textContent='Why this match?';
-  const met=document.createElement('button'); met.className='small'; met.style.textDecoration='underline'; met.style.border=0; met.style.background='transparent'; met.textContent='View metrics';
-  controls.appendChild(why); controls.appendChild(met); wrap.appendChild(controls);
-
-  const whyBox=document.createElement('div'); whyBox.className='card'; whyBox.style.padding='10px'; whyBox.style.background='#f8fafc'; whyBox.style.marginTop='6px'; whyBox.style.display='none';
-  const whyList=document.createElement('div'); whyList.className='xsmall';
-  r.score.parts.forEach(p=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.margin='4px 0'; row.innerHTML=`<span>${p.label}</span><span class="tabular">${Math.round(p.score*100)}% × ${Math.round(p.weight*100)}% = <strong>${p.points}</strong></span>`; whyList.appendChild(row) });
-  whyBox.appendChild(whyList); wrap.appendChild(whyBox);
-
-  const metBox=document.createElement('div'); metBox.className='card'; metBox.style.padding='10px'; metBox.style.background='#f8fafc'; metBox.style.marginTop='6px'; metBox.style.display='none';
-  metBox.innerHTML=`<div class="grid-3 small"><div><div class="xsmall">Transactions (12m)</div><div class="h3">${r.agent.transactions12m}</div></div>
-                    <div><div class="xsmall">DOM vs Area (seller)</div><div class="h3">${r.agent.domVsArea} days</div></div>
-                    <div><div class="xsmall">SP/LP Δ vs Area (seller)</div><div class="h3">${r.agent.spLpVsArea}%</div></div>
-                    <div><div class="xsmall">Buyer Price Δ vs Area</div><div class="h3">${r.agent.buyDiscountVsArea}%</div></div>
-                    <div><div class="xsmall">Marketing</div><div class="h3">${r.agent.marketing}/5</div></div>
-                    <div><div class="xsmall">Negotiation</div><div class="h3">${r.agent.negotiation}/5</div></div>
-                    <div><div class="xsmall">Brokerage Marketing</div><div class="h3">${r.agent.brokerageMarketing}/5</div></div>
-                    <div style="grid-column:1 / -1"><div class="xsmall">Neighborhoods</div><div class="small"><strong>${(r.agent.neighborhoods||[]).join(', ')}</strong></div></div></div>`;
-  wrap.appendChild(metBox);
-
-  why.onclick=()=>{ whyBox.style.display=(whyBox.style.display==='none'?'block':'none') };
-  met.onclick=()=>{ metBox.style.display=(metBox.style.display==='none'?'block':'none') };
-
-  const pillbar=document.createElement('div'); pillbar.className='pillbar'; pillbar.style.marginTop='8px';
-  (r.agent.propertyTypes||[]).forEach(t=>{ const s=document.createElement('span'); s.className='pill'; s.textContent=t; pillbar.appendChild(s) });
-  const f=document.createElement('span'); f.className='pill'; f.textContent=r.agent.focus+' focus'; pillbar.appendChild(f);
-  wrap.appendChild(pillbar);
-
-  const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='10px'; actions.style.marginTop='10px';
-  const btnChat=document.createElement('button'); btnChat.className='btn'; btnChat.textContent='Open anonymous chat';
-  const btnSave=document.createElement('button'); btnSave.className='btn btn-outline'; btnSave.textContent='Save for later';
-  actions.appendChild(btnChat); actions.appendChild(btnSave); wrap.appendChild(actions);
-  btnChat.onclick=()=>openChat(r.agent);
-
-  const note=document.createElement('div'); note.className='xsmall'; note.style.marginTop='6px'; note.textContent='No names or contact details shown. If both sides opt-in, we’ll connect you directly.';
-  wrap.appendChild(note);
-  return wrap
-}
-function renderAgentSmall(r){
-  const wrap=document.createElement('div'); wrap.className='card'; wrap.style.padding='12px';
-  const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between';
-  head.innerHTML=`<div class="small" style="font-weight:700">${r.agent.alias}</div><div class="small" style="font-weight:700">${r.score.total}</div>`;
-  wrap.appendChild(head);
-  const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style.marginTop='6px';
-  r.bullets.slice(0,3).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
-  wrap.appendChild(ul);
-  const btn=document.createElement('button'); btn.className='btn'; btn.style.width='100%'; btn.style.marginTop='8px'; btn.textContent='Chat anonymously';
-  btn.onclick=()=>openChat(r.agent); wrap.appendChild(btn);
-  return wrap
+/* ----------------------------- Layout primitives ----------------------------- */
+function Section({ id, title, subtitle, children }) {
+  return (
+    <section id={id} className="relative mx-auto max-w-6xl px-4 py-16 sm:py-20">
+      {title && (
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-gray-900">{title}</h2>
+          {subtitle && <p className="mt-2 max-w-3xl text-gray-600">{subtitle}</p>}
+        </div>
+      )}
+      {children}
+    </section>
+  );
 }
 
-/* ------------------ Chat ------------------ */
-const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatSend=document.getElementById('chat-send');
-function openChat(agent){
-  document.getElementById('chat-title').textContent=agent.alias;
-  const msgs=document.getElementById('chat-messages'); msgs.innerHTML='';
-  appendMsg('system',"Anonymous chat created. Share only what you're comfortable with.");
-  appendMsg(agent.alias,`Hi there! I can advise on ${(state.propertyType||'your goals').toLowerCase()} in ${state.location||'your area'}.`);
-  showModal();
-}
-function appendMsg(who,text){
-  const box=document.createElement('div'); box.className='card'; box.style.padding='8px 10px'; box.style.maxWidth='80%'; box.style.margin='6px 0';
-  if(who==='You'){ box.style.marginLeft='auto'; box.style.background='#111827'; box.style.color='#fff' }
-  const whoEl=document.createElement('div'); whoEl.className='xsmall'; whoEl.textContent=who;
-  const textEl=document.createElement('div'); textEl.className='small'; textEl.style.marginTop='4px'; textEl.textContent=text;
-  box.appendChild(whoEl); box.appendChild(textEl); const msgs=document.getElementById('chat-messages'); msgs.appendChild(box); msgs.scrollTop=msgs.scrollHeight
-}
-function showModal(){ modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false'); document.getElementById('chat-input').focus() }
-function hideModal(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true') }
-chatClose.onclick=hideModal;
-chatSend.onclick=()=>{ const inp=document.getElementById('chat-input'); const t=(inp.value||'').trim(); if(!t) return; appendMsg('You',t); inp.value='' };
-modal.addEventListener('click',e=>{ if(e.target===modal) hideModal() });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideModal() });
-
-/* ------------------ CSV Import (upload or paste) ------------------ */
-const fileInput=document.getElementById('csv-file'); const fileNote=document.getElementById('file-note');
-const txt=document.getElementById('csv-text'); const statusEl=document.getElementById('status');
-document.getElementById('btn-load-sample').onclick=()=>{ txt.value = txt.getAttribute('placeholder'); statusEl.textContent='Sample loaded.' };
-fileInput.onchange=async (e)=>{ const f=e.target.files?.[0]; if(!f) return; fileNote.textContent='Selected: '+f.name; const t=await f.text(); txt.value=t; statusEl.textContent='File loaded. Click Import.' };
-
-document.getElementById('btn-import').onclick=()=>{
-  try{
-    const rows=parseTable(txt.value.trim());
-    AGENTS=rows; statusEl.textContent='Imported '+rows.length+' agents. Matches now use your data.';
-    // auto-show results if user already completed questionnaire
-    document.getElementById('results').classList.remove('hidden');
-    renderResults(); location.hash='#results';
-  }catch(e){ statusEl.textContent='Import error: '+e.message }
-};
-function parseTable(text){
-  if(!text) throw new Error('Paste or upload a CSV first.');
-  const lines=text.split(/\r?\n/).filter(Boolean);
-  const delim = lines[0].includes('\t') ? '\t' : ',';
-  const headers=lines[0].split(delim).map(h=>h.trim());
-  const need = ['id','alias','neighborhoods','propertyTypes','priceMin','priceMax','focus','marketing','negotiation','transactions12m','resources','brokerageMarketing','domVsArea','spLpVsArea','buyDiscountVsArea'];
-  need.forEach(h=>{ if(!headers.includes(h)) throw new Error('Missing header: '+h) });
-  const toList=v=> v ? v.split(/;|\|/).map(x=>x.trim()).filter(Boolean) : [];
-  const out=[];
-  for(let i=1;i<lines.length;i++){
-    const cols=lines[i].split(delim).map(c=>c.trim()); const obj={}; headers.forEach((h,idx)=> obj[h]=cols[idx]??'');
-    out.push({
-      id:obj.id||'R'+i, alias:obj.alias||('Agent '+i),
-      neighborhoods:toList(obj.neighborhoods), propertyTypes:toList(obj.propertyTypes),
-      priceMin:parseFloat(obj.priceMin||0), priceMax:parseFloat(obj.priceMax||0),
-      focus:(obj.focus||'Seller').trim(), marketing:parseInt(obj.marketing||3), negotiation:parseInt(obj.negotiation||3),
-      transactions12m:parseInt(obj.transactions12m||0), resources:toList(obj.resources), brokerageMarketing:parseInt(obj.brokerageMarketing||3),
-      domVsArea:parseFloat(obj.domVsArea||0), spLpVsArea:parseFloat(obj.spLpVsArea||0), buyDiscountVsArea:parseFloat(obj.buyDiscountVsArea||0)
-    });
-  }
-  return out;
+function Pill({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+      {children}
+    </span>
+  );
 }
 
-/* ------------------ Misc init ------------------ */
-document.getElementById('year').textContent=new Date().getFullYear();
-</script>
-</body>
-</html>
+/* ----------------------------- Navbar ----------------------------- */
+function Navbar() {
+  const [open, setOpen] = useState(false);
+  return (
+    <header className="sticky top-0 z-40 w-full border-b border-gray-200/80 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-rose-500" />
+          <span className="text-sm font-semibold tracking-tight text-gray-900">Agent Ranks</span>
+        </div>
+
+        {/* Desktop nav */}
+        <nav className="hidden gap-6 text-sm text-gray-700 sm:flex">
+          <a href="#how" className="hover:text-gray-900">How it works</a>
+          <a href="#questionnaire" className="hover:text-gray-900">Get matched</a>
+          <a href="#results" className="hover:text-gray-900">Results</a>
+          <a href="#admin" className="hover:text-gray-900">Data (CSV)</a>
+        </nav>
+
+        {/* CTA + mobile button */}
+        <div className="flex items-center gap-2">
+          <a href="#questionnaire" className="hidden rounded-xl bg-gray-900 px-3 py-2 text-xs font-semibold text-white shadow hover:bg-gray-800 sm:inline-flex">
+            Find my best match
+          </a>
+          <button onClick={() => setOpen(!open)} className="inline-flex items-center rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold sm:hidden" aria-label="Open menu">
+            Menu
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="border-t border-gray-200 sm:hidden">
+          <div className="mx-auto grid max-w-6xl gap-2 px-4 py-3 text-sm">
+            <a onClick={() => setOpen(false)} href="#how">How it works</a>
+            <a onClick={() => setOpen(false)} href="#questionnaire">Get matched</a>
+            <a onClick={() => setOpen(false)} href="#results">Results</a>
+            <a onClick={() => setOpen(false)} href="#admin">Data (CSV)</a>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
+
+/* ----------------------------- Hero ----------------------------- */
+function Hero() {
+  const [tIdx, setTIdx] = useState(0);
+  const [sIdx, setSIdx] = useState(0);
+
+  useEffect(() => {
+    const t1 = setInterval(() => setTIdx(i => (i + 1) % TESTIMONIALS.length), 4000);
+    const t2 = setInterval(() => setSIdx(i => (i + 1) % HERO_SLIDES.length), 3500);
+    return () => { clearInterval(t1); clearInterval(t2); };
+  }, []);
+
+  const t = TESTIMONIALS[tIdx];
+  const s = HERO_SLIDES[sIdx];
+
+  return (
+    <div className="relative isolate overflow-hidden">
+      <div className="absolute inset-0 -z-10 opacity-20 [background-image:radial-gradient(1000px_800px_at_0%_0%,white,transparent)]" />
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:py-28">
+        <div className="grid items-center gap-10 sm:grid-cols-2">
+          {/* Left copy */}
+          <div>
+            <Pill>Unbiased • Credit Score Level Ratings</Pill>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+              Agent Ranks — find your best-fit real estate agent, privately
+            </h1>
+            <p className="mt-4 max-w-xl text-gray-700">
+              50+ matching signals (neighborhood, product type, price band, buyer/seller focus, marketing power, track record).
+              We present your best 3 matches — with no names or contact until <em>both</em> sides opt-in.
+            </p>
+            <div className="mt-6 flex items-center gap-3">
+              <a href="#questionnaire" className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-gray-800">
+                Start 2-minute match
+              </a>
+              <a href="#how" className="text-sm font-medium text-gray-800 hover:text-gray-900">How it works</a>
+            </div>
+
+            {/* rotating testimonial */}
+            <div className="mt-6 max-w-xl rounded-2xl bg-gray-900/90 p-4 text-white ring-1 ring-black/10">
+              <p className="text-sm">“{t.quote}”</p>
+              <p className="mt-1 text-xs text-white/80">— {t.who}</p>
+            </div>
+          </div>
+
+          {/* Right image with overlay labels */}
+          <div className="relative">
+            <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl ring-1 ring-gray-200">
+              <div
+                className="relative flex h-full items-end justify-between p-6 text-white transition-all duration-700"
+                style={{
+                  backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.0) 35%, rgba(0,0,0,.55) 100%), url('${s.image}')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <div className="pointer-events-none select-none">
+                  <div className="inline-flex rotate-[-8deg] rounded-xl border-2 border-white/70 bg-white/10 px-3 py-1 text-xs font-black tracking-widest shadow">
+                    {s.badge}
+                  </div>
+                  <div className="mt-3 text-lg font-semibold drop-shadow">{s.title}</div>
+                  <div className="text-xs opacity-90">{s.caption}</div>
+                </div>
+                <div className="flex flex-col items-end gap-2 text-right text-[11px]">
+                  <div className="rounded-xl bg-white/15 px-3 py-2 ring-1 ring-white/30">Anonymous chat ready</div>
+                  <div className="rounded-xl bg-white/15 px-3 py-2 ring-1 ring-white/30">No contact shared</div>
+                  <div className="rounded-xl bg-white/15 px-3 py-2 ring-1 ring-white/30">Mutual opt-in</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------------- How it works ----------------------------- */
+function HowItWorks() {
+  const steps = [
+    { title: "Tell us your goals", text: "Buyer or seller, neighborhood, property type, price band, timing, and key priorities." },
+    { title: "AI-assisted matching", text: "We weigh 50+ signals to rank agents most likely to achieve your outcome." },
+    { title: "Anonymous introductions", text: "Review short narratives for your top matches without exposing identity or contact info." },
+    { title: "Mutual opt-in & connect", text: "If you approve, we open a private chat. When both sides agree, we connect directly." },
+  ];
+  return (
+    <Section id="how" title="How it works" subtitle="Unbiased, data-driven matches. Comfortable, private introductions.">
+      <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((s, i) => (
+          <li key={i} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-xs font-semibold text-white">{i + 1}</div>
+            <h3 className="text-sm font-semibold text-gray-900">{s.title}</h3>
+            <p className="mt-1 text-sm text-gray-600">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </Section>
+  );
+}
+
+/* ----------------------------- Questionnaire ----------------------------- */
+function Questionnaire({ onComplete }) {
+  const [role, setRole] = useState("");
+  const [location, setLocation] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [priceRange, setPriceRange] = useState([400000, 1000000]);
+  const [priorities, setPriorities] = useState([]);
+  const [timing, setTiming] = useState("0-3 months");
+  const [step, setStep] = useState(0);
+
+  const PRIORITY_OPTIONS = ["Local Expertise", "Marketing Power", "Negotiation Strength", "New Construction Access", "Off-Market Access"];
+
+  const togglePriority = (p) =>
+    setPriorities((curr) => (curr.includes(p) ? curr.filter((x) => x !== p) : [...curr, p]));
+
+  const next = () => setStep((s) => Math.min(s + 1, 5));
+  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const finish = () => onComplete({ role, location, propertyType, priceRange, priorities, timing });
+
+  const canNext = useMemo(() => {
+    if (step === 0) return !!role;
+    if (step === 1) return location.trim().length > 1;
+    if (step === 2) return !!propertyType;
+    if (step === 3) return priceRange && priceRange[0] < priceRange[1];
+    if (step === 4) return priorities.length > 0;
+    return true;
+  }, [step, role, location, propertyType, priceRange, priorities]);
+
+  return (
+    <Section id="questionnaire" title="Get matched in under 2 minutes" subtitle="We only share anonymized needs until you choose to connect.">
+      <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="text-xs text-gray-600">Step {step + 1} of 6</div>
+          <div className="h-2 w-40 rounded bg-gray-100"><div className="h-full rounded bg-gray-900" style={{ width: `${((step + 1) / 6) * 100}%` }} /></div>
+        </div>
+
+        {step === 0 && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">Are you buying or selling?</h4>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {["Buyer", "Seller"].map((opt) => (
+                <button key={opt} onClick={() => setRole(opt)} className={cx("rounded-xl border px-4 py-3 text-left text-sm",
+                  role === opt ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 hover:border-gray-300")}>
+                  <div className="font-medium">{opt}</div>
+                  <div className="text-gray-500">{opt === "Buyer" ? "We’ll prioritize negotiation and availability." : "We’ll prioritize marketing power and days-on-market."}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">What neighborhood or area?</h4>
+            <input value={location} onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g., West Loop, Lincoln Park, Hinsdale"
+              className="mt-3 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gray-900" />
+            <p className="mt-2 text-xs text-gray-500">Tip: You can be specific (e.g., “Bucktown”) or broader (e.g., “North Shore”).</p>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">Property type</h4>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              {["Condo", "Single Family", "Townhome", "Loft", "Multi-Unit"].map((opt) => (
+                <button key={opt} onClick={() => setPropertyType(opt)} className={cx("rounded-xl border px-4 py-3 text-left text-sm",
+                  propertyType === opt ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 hover:border-gray-300")}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">Price range</h4>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-xs text-gray-600">Min</label>
+                <input type="number" value={priceRange[0]} onChange={(e) => setPriceRange([+e.target.value, priceRange[1]])}
+                  className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600">Max</label>
+                <input type="number" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], +e.target.value])}
+                  className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900" />
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-gray-500">Change later if you’re uncertain.</p>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">What matters most?</h4>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {PRIORITY_OPTIONS.map((opt) => (
+                <label key={opt} className={cx("flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm",
+                  priorities.includes(opt) ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 hover:border-gray-300")}>
+                  <input type="checkbox" checked={priorities.includes(opt)} onChange={() => togglePriority(opt)} className="hidden" />
+                  <span>{opt}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 5 && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">Timing</h4>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              {["0-3 months", "3-6 months", "6-12 months"].map((opt) => (
+                <button key={opt} onClick={() => setTiming(opt)} className={cx("rounded-xl border px-4 py-3 text-left text-sm",
+                  timing === opt ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 hover:border-gray-300")}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 flex items-center justify-between">
+          <button onClick={back} disabled={step === 0} className={cx("rounded-xl px-4 py-2 text-sm",
+            step === 0 ? "cursor-not-allowed bg-gray-100 text-gray-400" : "bg-gray-200 text-gray-800 hover:bg-gray-300")}>
+            Back
+          </button>
+          {step < 5 ? (
+            <button onClick={next} disabled={!canNext} className={cx("rounded-xl px-4 py-2 text-sm font-semibold",
+              canNext ? "bg-gray-900 text-white hover:bg-gray-800" : "cursor-not-allowed bg-gray-900/30 text-white/60")}>
+              Next
+            </button>
+          ) : (
+            <button onClick={finish} className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
+              See my matches
+            </button>
+          )}
+        </div>
+
+        <p className="mt-4 text-xs text-gray-500">Your details remain private. We only open a chat if you approve your matches and the agent agrees.</p>
+      </div>
+    </Section>
+  );
+}
+
+/* ----------------------------- Results & cards ----------------------------- */
+function AgentCard({ agent, score, bullets, onChat }) {
+  const [showWhy, setShowWhy] = useState(false);
+  const [showMetrics, setShowMetrics] = useState(false);
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Top Match</div>
+          <h4 className="text-base font-semibold text-gray-900">{agent.alias}</h4>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold text-gray-900">{score.total}</div>
+          <div className="text-[10px] uppercase text-gray-500">Fit score</div>
+        </div>
+      </div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-700">
+        {bullets.map((b, i) => <li key={i}>{b}</li>)}
+      </ul>
+
+      <div className="mt-3 flex items-center gap-4 text-xs">
+        <button onClick={() => setShowWhy(v => !v)} className="font-semibold text-gray-700 underline underline-offset-2">
+          {showWhy ? "Hide scoring" : "Why this match?"}
+        </button>
+        <button onClick={() => setShowMetrics(v => !v)} className="font-semibold text-gray-700 underline underline-offset-2">
+          {showMetrics ? "Hide metrics" : "View metrics"}
+        </button>
+      </div>
+
+      {showWhy && (
+        <div className="mt-2 rounded-xl bg-gray-50 p-3">
+          <ul className="space-y-1 text-xs text-gray-700">
+            {score.parts.map((p) => (
+              <li key={p.id} className="flex items-center justify-between">
+                <span>{p.label}</span>
+                <span className="tabular-nums">
+                  {Math.round(p.score * 100)}% × {Math.round(p.weight * 100)}% = <strong>{p.points}</strong>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {showMetrics && (
+        <div className="mt-2 rounded-xl bg-gray-50 p-3 text-xs text-gray-700">
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+            <Metric label="Transactions (12m)" value={agent.transactions12m} />
+            <Metric label="DOM vs Area (seller)" value={`${agent.domVsArea} days`} />
+            <Metric label="SP/LP Δ vs Area (seller)" value={`${agent.spLpVsArea}%`} />
+            <Metric label="Buyer Price Δ vs Area" value={`${agent.buyDiscountVsArea}%`} />
+            <Metric label="Marketing" value={`${agent.marketing}/5`} />
+            <Metric label="Negotiation" value={`${agent.negotiation}/5`} />
+            <Metric label="Brokerage Marketing" value={`${agent.brokerageMarketing}/5`} />
+            <div className="col-span-2">
+              <div className="text-gray-500">Neighborhoods</div>
+              <div className="font-semibold">{(agent.neighborhoods || []).join(", ")}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-600">
+        {(agent.propertyTypes || []).map((t) => <span key={t} className="rounded-full bg-gray-100 px-2 py-1">{t}</span>)}
+        <span className="rounded-full bg-gray-100 px-2 py-1">{agent.focus} focus</span>
+      </div>
+
+      <div className="mt-5 flex items-center gap-3">
+        <button onClick={() => onChat(agent)} className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
+          Open anonymous chat
+        </button>
+        <button className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+          Save for later
+        </button>
+      </div>
+
+      <p className="mt-3 text-[11px] text-gray-500">No names or contact details shown. If both sides opt-in, we’ll connect you directly.</p>
+    </div>
+  );
+}
+
+function Metric({ label, value }) {
+  return (
+    <div>
+      <div className="text-gray-500">{label}</div>
+      <div className="font-semibold">{value}</div>
+    </div>
+  );
+}
+
+function Results({ answers, onStartChat, agents }) {
+  const ranked = useMemo(() => {
+    return (agents || []).map((a) => {
+      const s = scoreAgent(a, answers);
+      return { agent: a, score: s, bullets: narrative(a, answers) };
+    }).sort((x, y) => y.score.total - x.score.total);
+  }, [answers, agents]);
+
+  const top3 = ranked.slice(0, 3);
+  const rest = ranked.slice(3, 10);
+
+  return (
+    <Section id="results" title="Your best-fit matches" subtitle="We highlight the top three based on your goals. You can still browse up to ten options.">
+      <div className="grid gap-5 lg:grid-cols-3">
+        {top3.map((r) => (
+          <AgentCard key={r.agent.id} agent={r.agent} score={r.score} bullets={r.bullets} onChat={onStartChat} />
+        ))}
+      </div>
+
+      <div className="mt-10">
+        <h3 className="text-sm font-semibold text-gray-900">Other relevant options</h3>
+        <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {rest.map((r) => (
+            <div key={r.agent.id} className="rounded-2xl border border-gray-200 bg-white p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold text-gray-900">{r.agent.alias}</div>
+                <div className="text-sm font-semibold text-gray-700">{r.score.total}</div>
+              </div>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-gray-600">
+                {r.bullets.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}
+              </ul>
+              <button onClick={() => onStartChat(r.agent)} className="mt-3 w-full rounded-xl bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800">
+                Chat anonymously
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ----------------------------- Chat modal ----------------------------- */
+function ChatModal({ open, onClose, agent, answers }) {
+  const [messages, setMessages] = useState([]);
+  const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setMessages([
+      { who: "system", text: "Anonymous chat created. Share only what you're comfortable with." },
+      { who: agent?.alias || "Agent", text: `Hi there! Happy to help. I can advise on ${answers?.propertyType?.toLowerCase() || "your goals"} in ${answers?.location || "your area"}.` },
+    ]);
+  }, [open, agent, answers]);
+
+  if (!open) return null;
+
+  const send = () => {
+    if (!draft.trim()) return;
+    setMessages((m) => [...m, { who: "You", text: draft.trim() }]);
+    setDraft("");
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
+      <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b p-4">
+          <div>
+            <div className="text-xs uppercase text-gray-500">Anonymous chat</div>
+            <div className="text-sm font-semibold text-gray-900">{agent?.alias}</div>
+          </div>
+          <button onClick={onClose} className="rounded-lg bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-200">Close</button>
+        </div>
+
+        <div className="h-64 overflow-y-auto p-4">
+          <ul className="space-y-3">
+            {messages.map((m, i) => (
+              <li key={i} className={cx("max-w-[85%] rounded-xl px-3 py-2 text-sm",
+                m.who === "You" ? "ml-auto bg-gray-900 text-white" : "bg-gray-100 text-gray-900")}>
+                <div className="text-[10px] font-semibold text-gray-500">{m.who}</div>
+                <div className="mt-1 text-[13px]">{m.text}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex items-center gap-2 border-t p-3">
+          <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Type a message…"
+            className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900" />
+          <button onClick={send} className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">Send</button>
+        </div>
+
+        <div className="border-t p-3 text-[11px] text-gray-500">Demo mode: no identities or contact details are shared. No emails or texts are sent.</div>
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------------- Admin: CSV import ----------------------------- */
+function AdminCSV({ onReplaceAgents }) {
+  const [csvText, setCsvText] = useState("");
+  const [status, setStatus] = useState("");
+  const [fileName, setFileName] = useState("");
+
+  const sample = `id,alias,neighborhoods,propertyTypes,priceMin,priceMax,focus,marketing,negotiation,transactions12m,resources,brokerageMarketing,domVsArea,spLpVsArea,buyDiscountVsArea
+X1,West Loop Condo Pro,West Loop;River North,Condo;Loft,600000,1600000,Seller,5,3,48,3D Tours;Broker Events;Pro Video,5,-8,1.1,0
+X2,North Shore Seller Strategist,Winnetka;Glencoe;Evanston;Wilmette,Single Family,900000,3500000,Seller,5,4,34,Staging;Aerial Video;Broker Network,5,-8,1.3,0
+X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,300000,800000,Buyer,3,5,38,Lender Intros;Buyer Workshops;Offer Playbooks,4,0,0,1.0`;
+
+  const parseCSV = (text) => {
+    const lines = text.trim().split(/\r?\n/).filter(Boolean);
+    if (!lines.length) throw new Error("No rows detected.");
+    const headers = lines[0].split(",").map((h) => h.trim());
+    const toList = (v) => (v ? v.split(/;|\|/).map((x) => x.trim()).filter(Boolean) : []);
+    const rows = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(",").map((c) => c.trim());
+      const obj = {};
+      headers.forEach((h, idx) => (obj[h] = cols[idx] ?? ""));
+
+      rows.push({
+        id: obj.id || `R${i}`,
+        alias: obj.alias || `Agent ${i}`,
+        neighborhoods: toList(obj.neighborhoods),
+        propertyTypes: toList(obj.propertyTypes),
+        priceMin: parseFloat(obj.priceMin || 0),
+        priceMax: parseFloat(obj.priceMax || 0),
+        focus: (obj.focus || "Seller").trim(),
+        marketing: parseInt(obj.marketing || 3),
+        negotiation: parseInt(obj.negotiation || 3),
+        transactions12m: parseInt(obj.transactions12m || 0),
+        resources: toList(obj.resources),
+        brokerageMarketing: parseInt(obj.brokerageMarketing || 3),
+        domVsArea: parseFloat(obj.domVsArea || 0),
+        spLpVsArea: parseFloat(obj.spLpVsArea || 0),
+        buyDiscountVsArea: parseFloat(obj.buyDiscountVsArea || 0),
+      });
+    }
+    return rows;
+  };
+
+  const importCSV = () => {
+    try {
+      const rows = parseCSV(csvText);
+      onReplaceAgents(rows);
+      setStatus(`Imported ${rows.length} agents. Matches now use your data.`);
+    } catch (e) {
+      setStatus(`Import error: ${e.message}`);
+    }
+  };
+
+  const onPickFile = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFileName(f.name);
+    const text = await f.text();
+    setCsvText(text);
+    setStatus(`Loaded file: ${f.name} (${text.length.toLocaleString()} bytes)`);
+  };
+
+  return (
+    <Section id="admin" title="Data (CSV import)" subtitle="Paste a CSV or upload a .csv file to replace the agent dataset for testing.">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="text-sm text-gray-700">
+          <p><strong>Columns:</strong> <code>id, alias, neighborhoods (;), propertyTypes (;), priceMin, priceMax, focus, marketing, negotiation, transactions12m, resources (;), brokerageMarketing, domVsArea, spLpVsArea, buyDiscountVsArea</code></p>
+          <p className="mt-2">Use <strong>semicolons</strong> for multi-values (e.g., <code>West Loop;River North</code>).</p>
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="text-xs text-gray-600">Upload .csv</label>
+            <input type="file" accept=".csv,text/csv" onChange={onPickFile}
+              className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm" />
+            {fileName && <div className="mt-1 text-xs text-gray-500">Selected: {fileName}</div>}
+          </div>
+          <div>
+            <label className="text-xs text-gray-600">Or paste CSV here</label>
+            <textarea rows={8} value={csvText} onChange={(e) => setCsvText(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-mono" placeholder={sample} />
+          </div>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button onClick={() => { setCsvText(sample); setStatus("Sample loaded into the box."); }}
+            className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+            Load sample
+          </button>
+          <button onClick={importCSV}
+            className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
+            Import CSV
+          </button>
+          <span className="text-xs text-gray-600">{status}</span>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ----------------------------- App root ----------------------------- */
+export default function App() {
+  const [answers, setAnswers] = useState(null);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatAgent, setChatAgent] = useState(null);
+  const [agents, setAgents] = useState(SEED_AGENTS);
+
+  const onComplete = (a) => {
+    setAnswers(a);
+    setTimeout(() => document.getElementById("results")?.scrollIntoView({ behavior: "smooth" }), 60);
+  };
+  const onStartChat = (agent) => { setChatAgent(agent); setChatOpen(true); };
+  const onReplaceAgents = (rows) => {
+    setAgents(rows);
+    if (answers) {
+      // re-run results scroll
+      setTimeout(() => document.getElementById("results")?.scrollIntoView({ behavior: "smooth" }), 60);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+      <Navbar />
+      <Hero />
+      <HowItWorks />
+      <Questionnaire onComplete={onComplete} />
+      {answers && <Results answers={answers} onStartChat={onStartChat} agents={agents} />}
+      <AdminCSV onReplaceAgents={onReplaceAgents} />
+      <footer className="border-t border-gray-200/80 bg-white/60">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
+          <p className="text-xs text-gray-500">© {new Date().getFullYear()} Agent Ranks — Demo Concept (Private)</p>
+          <div className="flex items-center gap-4 text-xs">
+            <a href="#how" className="text-gray-600 hover:text-gray-900">How it works</a>
+            <a href="#questionnaire" className="text-gray-600 hover:text-gray-900">Get matched</a>
+            <a href="#results" className="text-gray-600 hover:text-gray-900">Results</a>
+            <a href="#admin" className="text-gray-600 hover:text-gray-900">Data (CSV)</a>
+          </div>
+        </div>
+      </footer>
+
+      <ChatModal open={chatOpen} onClose={() => setChatOpen(false)} agent={chatAgent} answers={answers} />
+    </div>
+  );
+}
