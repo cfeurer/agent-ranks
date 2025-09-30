@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Ranks — Private, Unbiased Agent Matching (Demo)</title>
+<!-- Staging privacy -->
+<meta name="robots" content="noindex,nofollow">
 <style>
   :root{
     --ink:#0F172A; --muted:#475569; --border:#E2E8F0; --bg:#FFFFFF;
@@ -50,9 +52,30 @@
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
   .modal.hidden{display:none!important}
   .tabular{font-variant-numeric:tabular-nums}
+
+  /* Passphrase gate */
+  #gate{position:fixed;inset:0;background:linear-gradient(180deg,#f8fafc,#eef2ff);display:flex;align-items:center;justify-content:center;padding:24px;z-index:9999}
+  #gate .panel{max-width:420px;width:100%;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:20px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
+  <!-- PASSCODE GATE (client-side convenience; also enable password/noindex on hosting) -->
+  <div id="gate" role="dialog" aria-labelledby="gateTitle" aria-modal="true">
+    <div class="panel">
+      <h1 id="gateTitle" class="h2" style="margin:0 0 8px">Agent Ranks — Staging Access</h1>
+      <p class="xsmall">Enter the passphrase provided to you.</p>
+      <form id="gateForm" style="margin-top:8px">
+        <label for="pass" class="sr-only">Passphrase</label>
+        <input id="pass" name="pass" type="password" autocomplete="current-password"
+               style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px" required>
+        <div class="xsmall" style="margin:6px 0 12px">Hint: change <code>window.AGENT_RANKS_PASS</code> in the script.</div>
+        <button class="btn" type="submit" aria-label="Unlock site">Unlock</button>
+      </form>
+      <p id="gateMsg" class="xsmall" style="margin-top:10px;color:#b91c1c"></p>
+    </div>
+  </div>
+
   <!-- HEADER -->
   <header>
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
@@ -60,7 +83,7 @@
         <span id="brand-badge" aria-hidden="true"></span>
         <strong>Agent Ranks</strong>
       </div>
-      <nav class="nav-links">
+      <nav id="topnav" class="nav-links" aria-label="Primary">
         <a href="#how">How it works</a>
         <a href="#questionnaire">Get matched</a>
         <a href="#results">Results</a>
@@ -68,10 +91,10 @@
       </nav>
       <div style="display:flex;align-items:center;gap:8px;">
         <a href="#questionnaire" class="btn">Start</a>
-        <button id="menu-btn" class="btn-outline" aria-label="Open menu">Menu</button>
+        <button id="menu-btn" class="btn-outline" aria-controls="mobile-nav" aria-expanded="false" aria-label="Open menu">Menu</button>
       </div>
     </div>
-    <div id="mobile-nav" class="mobile-nav">
+    <div id="mobile-nav" class="mobile-nav" role="region" aria-label="Mobile navigation">
       <div class="container" style="padding:8px 16px;display:grid;gap:10px;border-top:1px solid var(--border)">
         <a href="#how">How it works</a>
         <a href="#questionnaire">Get matched</a>
@@ -226,8 +249,8 @@
         </div>
         <div class="grid-2" style="margin-top:12px">
           <div>
-            <div class="xsmall">Upload .csv</div>
-            <input type="file" id="csv-file" accept=".csv,text/csv" style="width:100%;margin-top:6px">
+            <div class="xsmall">Upload .csv/.tsv</div>
+            <input type="file" id="csv-file" accept=".csv,.tsv,text/csv,text/tab-separated-values" style="width:100%;margin-top:6px">
             <div id="file-note" class="xsmall" style="margin-top:6px"></div>
           </div>
           <div>
@@ -242,8 +265,31 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
         <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
           <button id="btn-load-sample" class="btn btn-outline">Load sample</button>
           <button id="btn-import" class="btn">Import</button>
-          <span id="status" class="xsmall"></span>
+          <span id="status" class="xsmall" aria-live="polite"></span>
         </div>
+
+        <!-- Preview + Row-level errors -->
+        <div class="grid-2" style="margin-top:14px">
+          <div>
+            <div class="h3">Preview (first 500 rows)</div>
+            <div style="max-height:320px;overflow:auto;border:1px solid var(--border);border-radius:10px">
+              <table aria-label="Parsed table" style="width:100%;border-collapse:collapse">
+                <thead id="thead"></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="h3">Row-level Errors</div>
+            <div style="max-height:320px;overflow:auto;border:1px solid var(--border);border-radius:10px">
+              <table aria-label="Row errors" style="width:100%;border-collapse:collapse">
+                <thead><tr><th class="xsmall">#</th><th class="xsmall">Message</th><th class="xsmall">Sample</th></tr></thead>
+                <tbody id="errbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -272,11 +318,30 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
   </footer>
 
 <script>
-/* ========== Mobile menu ========== */
-document.getElementById('menu-btn').onclick = () => {
-  const m = document.getElementById('mobile-nav');
-  m.style.display = (m.style.display==='block') ? 'none' : 'block';
+/* ===== CONFIG ===== */
+window.AGENT_RANKS_PASS = "pilot-2025"; // change for staging; also enable host-level passwording
+
+/* ========== Mobile menu (accessible) ========== */
+const menuBtn = document.getElementById('menu-btn');
+const mobileNav = document.getElementById('mobile-nav');
+menuBtn.onclick = () => {
+  const open = mobileNav.style.display==='block' ? false : true;
+  mobileNav.style.display = open ? 'block' : 'none';
+  menuBtn.setAttribute('aria-expanded', String(open));
+  menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 };
+window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && mobileNav.style.display==='block'){ mobileNav.style.display='none'; menuBtn.setAttribute('aria-expanded','false'); }});
+
+/* ========== Passphrase gate ========== */
+const gate = document.getElementById('gate');
+const gateForm = document.getElementById('gateForm');
+const gateMsg = document.getElementById('gateMsg');
+gateForm.addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const val = document.getElementById('pass').value;
+  if(val === window.AGENT_RANKS_PASS){ gate.remove(); }
+  else { gateMsg.textContent = 'Incorrect passphrase.'; }
+});
 
 /* ========== Animated Rank Badge (SVG) ========== */
 function rankBadgeSVG(value, opts){
@@ -313,8 +378,6 @@ function rankBadgeSVG(value, opts){
         font-weight="800" font-size="${fsz}" fill="${text}" class="pulse">${v}</text>
 </svg>`;
 }
-
-/* Place brand badge in header */
 document.getElementById('brand-badge').innerHTML = rankBadgeSVG(98, {size:28, spin:false});
 
 /* ========== Hero rotation + testimonials ========== */
@@ -329,7 +392,7 @@ let tIdx=0; setInterval(()=>{ tIdx=(tIdx+1)%TESTIMONIALS.length;
 }, 4000);
 let slideIdx=0; const ids=['slide0','slide1','slide2']; setInterval(()=>{ slideIdx=(slideIdx+1)%ids.length; ids.forEach((id,i)=>{ document.getElementById(id).classList.toggle('active', i===slideIdx) }) }, 3500);
 
-/* ========== Data + scoring ========== */
+/* ========== Data + scoring (unchanged) ========== */
 let AGENTS = [
   {id:'A1',alias:'North Side Neighborhood Pro',neighborhoods:['Lincoln Park','Lakeview','Bucktown','Wicker Park'],propertyTypes:['Condo','Single Family','Townhome'],priceMin:500000,priceMax:1500000,focus:'Seller',marketing:5,negotiation:4,transactions12m:42,resources:['Staging','Pro Video','Paid Social'],brokerageMarketing:5,domVsArea:-7,spLpVsArea:1.2,buyDiscountVsArea:0.1},
   {id:'A2',alias:'Downtown High-Rise Specialist',neighborhoods:['West Loop','River North','Loop'],propertyTypes:['Condo','Loft'],priceMin:600000,priceMax:2000000,focus:'Seller',marketing:5,negotiation:3,transactions12m:55,resources:['3D Tours','In-Building Network','Broker Events'],brokerageMarketing:5,domVsArea:-9,spLpVsArea:0.8,buyDiscountVsArea:0.0},
@@ -386,7 +449,7 @@ function narrative(agent,answers){
   return bullets;
 }
 
-/* ========== Questionnaire wiring ========== */
+/* ========== Questionnaire wiring (unchanged) ========== */
 const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
 const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
 const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
@@ -422,7 +485,7 @@ nextBtn.onclick=()=>{ if(step<5) goStep(step+1) };
 finishBtn.onclick=()=>{ document.getElementById('results').classList.remove('hidden'); window.location.hash='#results'; renderResults() };
 goStep(0);
 
-/* ========== Results render ========== */
+/* ========== Results render (unchanged) ========== */
 function renderResults(){
   const ranked = (AGENTS||[]).map(a=>({ agent:a, score:scoreAgent(a,state), bullets:narrative(a,state) })).sort((x,y)=> y.score.total-x.score.total);
   const top3=ranked.slice(0,3), rest=ranked.slice(3,10);
@@ -505,7 +568,7 @@ function renderAgentSmall(r){
   return wrap
 }
 
-/* ========== Chat ========== */
+/* ========== Chat (unchanged) ========== */
 const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatSend=document.getElementById('chat-send');
 function openChat(agent){
   document.getElementById('chat-title').textContent=agent.alias;
@@ -528,38 +591,161 @@ chatSend.onclick=()=>{ const inp=document.getElementById('chat-input'); const t=
 modal.addEventListener('click',e=>{ if(e.target===modal) hideModal() });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideModal() });
 
-/* ========== CSV Import (upload or paste) ========== */
+/* ========== CSV Import — Web Worker (robust) ========== */
 const fileInput=document.getElementById('csv-file'); const fileNote=document.getElementById('file-note');
 const txt=document.getElementById('csv-text'); const statusEl=document.getElementById('status');
+const thead=document.getElementById('thead'); const tbody=document.getElementById('tbody'); const errbody=document.getElementById('errbody');
+
 document.getElementById('btn-load-sample').onclick=()=>{ txt.value = txt.getAttribute('placeholder'); statusEl.textContent='Sample loaded.' };
 fileInput.onchange=async (e)=>{ const f=e.target.files?.[0]; if(!f) return; fileNote.textContent='Selected: '+f.name; const t=await f.text(); txt.value=t; statusEl.textContent='File loaded. Click Import.' };
 
 document.getElementById('btn-import').onclick=()=>{
-  try{
-    const rows=parseTable(txt.value.trim());
-    AGENTS=rows; statusEl.textContent='Imported '+rows.length+' agents. Matches now use your data.';
-    document.getElementById('results').classList.remove('hidden');
-    renderResults(); location.hash='#results';
-  }catch(e){ statusEl.textContent='Import error: '+e.message }
+  const text = (txt.value||'').trim();
+  if(!text){ statusEl.textContent='Paste or upload a CSV/TSV first.'; return; }
+  tbody.innerHTML=''; thead.innerHTML=''; errbody.innerHTML=''; statusEl.textContent='Parsing…';
+
+  const delim = autodetectDelimiter(text.slice(0, 1000)); // ',' or '\t'
+  worker.postMessage({ text, delim });
 };
-function parseTable(text){
-  if(!text) throw new Error('Paste or upload a CSV first.');
-  const lines=text.split(/\r?\n/).filter(Boolean);
-  const delim = lines[0].includes('\t') ? '\t' : ',';
-  const headers=lines[0].split(delim).map(h=>h.trim());
+
+function autodetectDelimiter(sample){
+  const tab=(sample.match(/\t/g)||[]).length, comma=(sample.match(/,/g)||[]).length;
+  return tab>comma ? '\t' : ',';
+}
+
+// Build a worker from a blob
+const workerCode = `
+self.onmessage = (e) => {
+  const { text, delim } = e.data;
+  const lines = splitRows(text);
+  const out = [];
+  const errors = [];
+  let header = null;
+  for(let i=0;i<lines.length;i++){
+    const row = parseCSVLine(lines[i], delim);
+    if(i===0){ header = row; out.push(row); continue; }
+    if(row.length !== header.length){
+      errors.push({ idx:i+1, msg:'Column count mismatch ('+row.length+' != '+header.length+')', sample:lines[i].slice(0,140) });
+      continue;
+    }
+    out.push(row);
+    if(i % 200 === 0){ self.postMessage({ type:'progress', done:i, total:lines.length }); }
+  }
+  self.postMessage({ type:'done', header, rows: out.slice(1), errors });
+};
+
+function splitRows(text){
+  const rows=[]; let cur='', inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c === '"'){
+      if(inQuotes && n === '"'){ cur+='"'; i++; } else { inQuotes = !inQuotes; }
+    } else if(c === '\\n' && !inQuotes){
+      rows.push(cur); cur='';
+    } else if(c === '\\r' && n === '\\n' && !inQuotes){
+      rows.push(cur); cur=''; i++;
+    } else {
+      cur += c;
+    }
+  }
+  if(cur) rows.push(cur);
+  return rows.filter(r => r.length>0);
+}
+
+function parseCSVLine(line, delim){
+  const d=delim; const res=[]; let cur='', inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i], n=line[i+1];
+    if(c === '"'){
+      if(inQuotes && n === '"'){ cur+='"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if(c === d && !inQuotes){
+      res.push(cur); cur='';
+    } else {
+      cur += c;
+    }
+  }
+  res.push(cur);
+  return res.map(s => s.trim());
+}
+`;
+const worker = new Worker(URL.createObjectURL(new Blob([workerCode], {type:'application/javascript'})));
+
+worker.onmessage = (e)=>{
+  const { type } = e.data;
+  if(type === 'progress'){
+    const { done, total } = e.data;
+    statusEl.textContent = 'Parsing… ' + done + '/' + total + ' lines';
+  } else if(type === 'done'){
+    const { header, rows, errors } = e.data;
+    renderPreview(header, rows);
+    renderErrors(errors);
+    const mapped = mapRowsToAgents(header, rows, errors);
+    if(mapped){
+      AGENTS = mapped;
+      statusEl.textContent = 'Done. Rows: '+rows.length+' | Errors: '+errors.length+'. Matches now use your data.';
+      document.getElementById('results').classList.remove('hidden'); renderResults(); location.hash='#results';
+    }
+  }
+};
+
+function renderPreview(header, rows){
+  // header
+  thead.innerHTML='';
+  const tr = document.createElement('tr');
+  header.forEach(h=>{ const th=document.createElement('th'); th.className='xsmall'; th.textContent=h; tr.appendChild(th); });
+  thead.appendChild(tr);
+  // body (max 500)
+  tbody.innerHTML='';
+  const maxPreview=Math.min(500, rows.length);
+  for(let i=0;i<maxPreview;i++){
+    const rtr=document.createElement('tr');
+    rows[i].forEach(cell=>{ const td=document.createElement('td'); td.className='xsmall'; td.textContent=cell; rtr.appendChild(td); });
+    tbody.appendChild(rtr);
+  }
+}
+
+function renderErrors(errs){
+  errbody.innerHTML='';
+  errs.forEach(e=>{
+    const tr=document.createElement('tr');
+    const td1=document.createElement('td'); td1.className='xsmall'; td1.textContent = e.idx;
+    const td2=document.createElement('td'); td2.className='xsmall'; td2.textContent = e.msg;
+    const td3=document.createElement('td'); td3.className='xsmall'; td3.textContent = e.sample;
+    tr.append(td1,td2,td3); errbody.appendChild(tr);
+  });
+}
+
+function mapRowsToAgents(header, rows, errors){
   const need = ['id','alias','neighborhoods','propertyTypes','priceMin','priceMax','focus','marketing','negotiation','transactions12m','resources','brokerageMarketing','domVsArea','spLpVsArea','buyDiscountVsArea'];
-  need.forEach(h=>{ if(!headers.includes(h)) throw new Error('Missing header: '+h) });
-  const toList=v=> v ? v.split(/;|\|/).map(x=>x.trim()).filter(Boolean) : [];
+  const missing = need.filter(h => !header.includes(h));
+  if(missing.length){
+    statusEl.textContent = 'Import error: missing headers: '+missing.join(', ');
+    return null;
+  }
+  const idx = Object.fromEntries(header.map((h,i)=>[h,i]));
+  const toList = v => v ? v.split(/;|\|/).map(x=>x.trim()).filter(Boolean) : [];
   const out=[];
-  for(let i=1;i<lines.length;i++){
-    const cols=lines[i].split(delim).map(c=>c.trim()); const obj={}; headers.forEach((h,idx)=> obj[h]=cols[idx]??'');
+  for(let r=0;r<rows.length;r++){
+    const cols = rows[r];
+    // skip rows that already flagged a length error
+    if(cols.length !== header.length) continue;
     out.push({
-      id:obj.id||'R'+i, alias:obj.alias||('Agent '+i),
-      neighborhoods:toList(obj.neighborhoods), propertyTypes:toList(obj.propertyTypes),
-      priceMin:parseFloat(obj.priceMin||0), priceMax:parseFloat(obj.priceMax||0),
-      focus:(obj.focus||'Seller').trim(), marketing:parseInt(obj.marketing||3), negotiation:parseInt(obj.negotiation||3),
-      transactions12m:parseInt(obj.transactions12m||0), resources:toList(obj.resources), brokerageMarketing:parseInt(obj.brokerageMarketing||3),
-      domVsArea:parseFloat(obj.domVsArea||0), spLpVsArea:parseFloat(obj.spLpVsArea||0), buyDiscountVsArea:parseFloat(obj.buyDiscountVsArea||0)
+      id: cols[idx.id] || ('R'+(r+1)),
+      alias: cols[idx.alias] || ('Agent '+(r+1)),
+      neighborhoods: toList(cols[idx.neighborhoods]),
+      propertyTypes: toList(cols[idx.propertyTypes]),
+      priceMin: parseFloat(cols[idx.priceMin] || 0),
+      priceMax: parseFloat(cols[idx.priceMax] || 0),
+      focus: (cols[idx.focus] || 'Seller').trim(),
+      marketing: parseInt(cols[idx.marketing] || 3),
+      negotiation: parseInt(cols[idx.negotiation] || 3),
+      transactions12m: parseInt(cols[idx.transactions12m] || 0),
+      resources: toList(cols[idx.resources]),
+      brokerageMarketing: parseInt(cols[idx.brokerageMarketing] || 3),
+      domVsArea: parseFloat(cols[idx.domVsArea] || 0),
+      spLpVsArea: parseFloat(cols[idx.spLpVsArea] || 0),
+      buyDiscountVsArea: parseFloat(cols[idx.buyDiscountVsArea] || 0)
     });
   }
   return out;
@@ -567,6 +753,14 @@ function parseTable(text){
 
 /* ========== Misc init ========== */
 document.getElementById('year').textContent=new Date().getFullYear();
+
+/* README (inline)
+- Keep <meta name="robots" content="noindex,nofollow"> in staging.
+- Enable Vercel/Netlify password/basic-auth; the client passphrase gate is convenience only.
+- CSV parser (Web Worker) supports TAB or comma, quoted cells, embedded newlines, escaped quotes.
+- Preview limited to 500 rows for speed; full parse still occurs.
+- Row-level errors table shows lines with column mismatches.
+*/
 </script>
 </body>
 </html>
