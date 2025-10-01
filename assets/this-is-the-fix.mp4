@@ -858,3 +858,9 @@ document.getElementById('year').textContent=new Date().getFullYear();
 </script>
 </body>
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const g = document.getElementById('gate'); 
+  if (g) g.remove();
+});
+</script>
