@@ -46,11 +46,6 @@
   .hidden{display:none}
   .footer{border-top:1px solid var(--border);background:#fff}
 
-  /* Staging passphrase gate */
-  #gate{position:fixed;inset:0;background:linear-gradient(180deg,#f8fafc,#eef2ff);display:flex;align-items:center;justify-content:center;padding:24px;z-index:9999}
-  #gate .panel{max-width:420px;width:100%;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:20px}
-  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-
   /* Modal */
   .modal.hidden,[aria-hidden="true"].modal{display:none!important}
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
@@ -67,22 +62,6 @@
 </style>
 </head>
 <body>
-
-<!-- PASSCODE GATE (staging only; remove if not needed) -->
-<div id="gate" role="dialog" aria-labelledby="gateTitle" aria-modal="true">
-  <div class="panel">
-    <h1 id="gateTitle" class="h2" style="margin:0 0 8px">Agent Ranks — Staging Access</h1>
-    <p class="xsmall">Enter the passphrase provided to you.</p>
-    <form id="gateForm" style="margin-top:8px">
-      <label for="pass" class="sr-only">Passphrase</label>
-      <input id="pass" name="pass" type="password" autocomplete="current-password"
-             style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px" required>
-      <div class="xsmall" style="margin:6px 0 12px">Hint: change <code>window.AGENT_RANKS_PASS</code> in the script.</div>
-      <button class="btn" type="submit" aria-label="Unlock site">Unlock</button>
-    </form>
-    <p id="gateMsg" class="xsmall" style="margin-top:10px;color:var(--err)"></p>
-  </div>
-</div>
 
 <!-- HEADER -->
 <header>
@@ -376,7 +355,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
         <button type="submit" class="btn">Start my anonymous chat</button>
         <button type="button" class="btn btn-outline" id="pg-cancel">Cancel</button>
       </div>
-      <div id="pg-error" class="xsmall" style="color:var(--err)"></div>
+      <div id="pg-error" class="xsmall" style="color:#b91c1c"></div>
     </form>
   </div>
 </div>
@@ -389,10 +368,7 @@ X3,First-Time Buyer Guide,Lincoln Square;Ravenswood;Logan Square,Condo;Townhome,
 </footer>
 
 <script>
-/* ===== CONFIG ===== */
-window.AGENT_RANKS_PASS = "pilot-2025"; // change or remove with gate
-
-/* Mobile nav (accessible) */
+/* ===== Mobile nav ===== */
 const menuBtn = document.getElementById('menu-btn');
 const mobileNav = document.getElementById('mobile-nav');
 menuBtn.onclick = () => {
@@ -403,16 +379,7 @@ menuBtn.onclick = () => {
 };
 window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && mobileNav.style.display==='block'){ mobileNav.style.display='none'; menuBtn.setAttribute('aria-expanded','false'); }});
 
-/* Staging passphrase */
-const gate = document.getElementById('gate');
-document.getElementById('gateForm').addEventListener('submit',(e)=>{
-  e.preventDefault();
-  const val = document.getElementById('pass').value;
-  if(val === window.AGENT_RANKS_PASS){ gate.remove(); }
-  else { document.getElementById('gateMsg').textContent = 'Incorrect passphrase.'; }
-});
-
-/* Hero video pause when off-screen */
+/* ===== Hero video pause when off-screen ===== */
 (() => {
   const v = document.getElementById('heroVideo');
   if (!v) return;
@@ -424,7 +391,7 @@ document.getElementById('gateForm').addEventListener('submit',(e)=>{
   io.observe(v);
 })();
 
-/* ===== Static progress badge (facts everywhere) ===== */
+/* ===== Static progress badge (facts) ===== */
 function createRankBadge(value, { size = 42 } = {}) {
   const v = Math.max(0, Math.min(100, Math.round(value)));
   const gid = 'g' + Math.random().toString(36).slice(2,7);
@@ -445,7 +412,7 @@ function createRankBadge(value, { size = 42 } = {}) {
 </svg>`;
 }
 
-/* (Optional) motion badge for branding spots */
+/* (Optional) motion badge helper for branding spots */
 function createMotionBadge(value, { size = 64 } = {}) {
   const v = Math.max(0, Math.min(100, Math.round(value)));
   const gid = 'grad' + v + size + Math.random().toString(36).slice(2,7);
@@ -514,7 +481,7 @@ function scoreAgent(agent,answers){
   return { total, parts, raw }
 }
 
-/* ========= Privacy Gate & PLID ========= */
+/* ===== Privacy Gate & PLID ===== */
 const PG = {
   el: document.getElementById('privacy-gate'),
   form: document.getElementById('pg-form'),
@@ -555,7 +522,7 @@ async function getOrCreatePLID(){
   return plid;
 }
 
-/* ========= Questionnaire wiring ========= */
+/* ===== Questionnaire wiring ===== */
 const state={role:'',location:'',propertyType:'',priceRange:[400000,1000000],priorities:[],timing:'0-3 months'};
 const stepEls=[...Array(6)].map((_,i)=>document.getElementById('step-'+i));
 const nextBtn=document.getElementById('btn-next'), backBtn=document.getElementById('btn-back'), finishBtn=document.getElementById('btn-finish');
@@ -651,7 +618,7 @@ function renderAgentCard(r){
   const f=document.createElement('span'); f.className='pill'; f.textContent=(r.agent.focus||'').toLowerCase()+' focus'; pillbar.appendChild(f);
   wrap.appendChild(pillbar);
 
-  const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='10px'; actions.style	marginTop='10px';
+  const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='10px'; actions.style.marginTop='10px';
   const btnChat=document.createElement('button'); btnChat.className='btn'; btnChat.textContent='Open anonymous chat';
   const btnSave=document.createElement('button'); btnSave.className='btn btn-outline'; btnSave.textContent='Save for later';
   actions.appendChild(btnChat); actions.appendChild(btnSave); wrap.appendChild(actions);
@@ -666,7 +633,7 @@ function renderAgentSmall(r){
   const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between';
   head.innerHTML=`<div class="small" style="font-weight:700;display:flex;align-items:center;gap:8px;">${createRankBadge(r.score.total,{size:34})}${r.agent.alias}</div><div class="small" style="font-weight:700">${r.score.total}</div>`;
   wrap.appendChild(head);
-  const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style	marginTop='6px';
+  const ul=document.createElement('ul'); ul.className='list xsmall'; ul.style.marginTop='6px';
   r.bullets.slice(0,3).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li) });
   const btn=document.createElement('button'); btn.className='btn'; btn.style.width='100%'; btn.style.marginTop='8px'; btn.textContent='Chat anonymously';
   btn.onclick=()=>openChat(r.agent); wrap.appendChild(ul); wrap.appendChild(btn);
@@ -701,7 +668,6 @@ function buildNarrative(agent, answers){
 /* ===== Chat (wrap with privacy gate) ===== */
 const modal=document.getElementById('chat-modal'); const chatClose=document.getElementById('chat-close'); const chatSend=document.getElementById('chat-send');
 function openChat(agent){
-  // Privacy gate: require PLID first
   const store = JSON.parse(localStorage.getItem('agent_ranks') || '{}');
   if(!(store.plid && store.client && store.client.verified)){
     showPrivacyGate();
@@ -855,12 +821,34 @@ function mapRowsToAgents(header, rows){
 
 /* Init */
 document.getElementById('year').textContent=new Date().getFullYear();
+
+/* ===== (Optional) SAFE PASSCODE GATE — DISABLED BY DEFAULT =====
+   To enable, uncomment this block and set window.AGENT_RANKS_PASS, then add the gate <div>.
+
+window.AGENT_RANKS_PASS = "pilot-2025";
+(() => {
+  const gateHTML = `
+<div id="gate" role="dialog" aria-labelledby="gateTitle" aria-modal="true" style="position:fixed;inset:0;background:linear-gradient(180deg,#f8fafc,#eef2ff);display:flex;align-items:center;justify-content:center;padding:24px;z-index:9999">
+  <div class="card" style="max-width:420px;width:100%;padding:20px">
+    <h1 id="gateTitle" class="h2" style="margin:0 0 8px">Agent Ranks — Staging Access</h1>
+    <p class="xsmall">Enter the passphrase provided to you.</p>
+    <form id="gateForm" onsubmit="return false" style="margin-top:8px">
+      <label for="pass" class="sr-only">Passphrase</label>
+      <input id="pass" name="pass" type="password" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px" required>
+      <div class="xsmall" style="margin:6px 0 12px">Hint: change <code>window.AGENT_RANKS_PASS</code> in the script.</div>
+      <button id="gateSubmit" class="btn" type="button" aria-label="Unlock">Unlock</button>
+    </form>
+    <p id="gateMsg" class="xsmall" style="margin-top:10px;color:var(--err)"></p>
+  </div>
+</div>`;
+  document.body.insertAdjacentHTML('afterbegin', gateHTML);
+  document.getElementById('gateSubmit').onclick = () => {
+    const val = (document.getElementById('pass').value||'').trim();
+    if (val === window.AGENT_RANKS_PASS) document.getElementById('gate').remove();
+    else document.getElementById('gateMsg').textContent = 'Incorrect passphrase.';
+  };
+})();
+===== */
 </script>
 </body>
 </html>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const g = document.getElementById('gate'); 
-  if (g) g.remove();
-});
-</script>
